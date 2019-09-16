@@ -66,5 +66,11 @@ public class TraceLogConstants {
 	public final static String COLLECTION_TYPE_MAP = "Map";
 
 	public final static String COLLECTION_TYPE_QUEUE = "Queue";
+	
+	public final static String COLLECTION_TYPE_VECTOR = "Vector";
+
+	public final static String COLLECTION_TYPE_STACK = "Stack";
+	
+	
 
 }
