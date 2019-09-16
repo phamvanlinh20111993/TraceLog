@@ -4,6 +4,7 @@
 package tracelog.phamlinh.example.object;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author PhamVanLinh
@@ -24,6 +25,8 @@ public class KeyPairValue {
 	private List<Integer> testCollectionObject;
 	
 	private List<RegexCondition> testListCollectionObject;
+	
+	private Map<String, RegexCondition> valueTestMap;
 	
 	/**
 	 * 
@@ -92,6 +95,16 @@ public class KeyPairValue {
 		this.type = type;
 		this.key = key;
 		this.test = test;
+	}
+
+	/**
+	 * @param value
+	 * @param valueTestMap
+	 */
+	public KeyPairValue(String value, Map<String, RegexCondition> valueTestMap) {
+		super();
+		this.value = value;
+		this.valueTestMap = valueTestMap;
 	}
 
 	/**
@@ -225,5 +238,21 @@ public class KeyPairValue {
 	public void setTestListCollectionObject(List<RegexCondition> testListCollectionObject) {
 		this.testListCollectionObject = testListCollectionObject;
 	}
+
+	/**
+	 * @return the valueTestMap
+	 */
+	public Map<String, RegexCondition> getValueTestMap() {
+		return valueTestMap;
+	}
+
+	/**
+	 * @param valueTestMap the valueTestMap to set
+	 */
+	public void setValueTestMap(Map<String, RegexCondition> valueTestMap) {
+		this.valueTestMap = valueTestMap;
+	}
+	
+	
 	
 }

@@ -39,7 +39,8 @@ public class Main {
 		
 		List<RegexCondition> test = new ArrayList<>();
 		test.add(new RegexCondition("aaa", true, "type", "signalPrefix", "format"));
-		
+		HashMap<String, RegexCondition> valueTestMap = new HashMap<>();
+		valueTestMap.put("test for key", new RegexCondition("dddđ", true, "we", "ddrưerewdđ", "drweddđ"));
 		console.logWarning("Show list object: %%{ob} = %%{n}", new KeyPairValue[] {
 				new KeyPairValue("karteId", "customerName"), new KeyPairValue("karteId1", "customerName1"), null,
 				new KeyPairValue("karteId2", "customerName2", null, new Integer[] { 1, 2, 3, 4 }),
@@ -48,7 +49,8 @@ public class Main {
 				new KeyPairValue(test),
 				new KeyPairValue("karteId5", "customerName5",
 						new RegexCondition[] { new RegexCondition("bb", true, "bbb", "bbb", "bbb"),
-								new RegexCondition("ccc", true, "cccc", "ccc", "ccc")}) },
+								new RegexCondition("ccc", true, "cccc", "ccc", "ccc")})
+				, new KeyPairValue("test map ok bavy", valueTestMap)},
 
 				new Integer[] { 10, 100 });
 		
@@ -69,7 +71,6 @@ public class Main {
 		Map<String, String> abc = new HashMap<>();
 		abc.put("fas", "gdfdgdf");
 		System.out.println("check " + TraceLogUtils.isJavaUtilObject(test));
-		
-		System.out.println(new Date().toString());
+	
 	}
 }

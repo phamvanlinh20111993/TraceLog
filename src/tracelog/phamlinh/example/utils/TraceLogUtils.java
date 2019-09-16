@@ -9,6 +9,7 @@ import java.util.IllegalFormatException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
@@ -18,6 +19,7 @@ import java.util.regex.Pattern;
 import javax.activation.UnsupportedDataTypeException;
 
 import tracelog.phamlinh.example.object.KeyPairValue;
+import tracelog.phamlinh.example.object.TransferMapToObject;
 
 public class TraceLogUtils {
 
@@ -140,25 +142,25 @@ public class TraceLogUtils {
 
 	/**
 	 * 
-	 * @param collection
+	 * @param object
 	 * @return
 	 * @throws UnsupportedDataTypeException
 	 * @throws NullPointerException
 	 */
-	public static String[] convertCollectionTypeToString(Collection<?> collection)
+	public static String[] convertCollectionTypeToString(Object object)
 			throws UnsupportedDataTypeException, NullPointerException {
 
-		if (collection instanceof Map) {
-			Iterator<Map.Entry<Object, Object>> collectionMap = ((Map) collection).entrySet().iterator();
+		if (object instanceof Map) {
+			Iterator<Map.Entry<Object, Object>> collectionMap = ((Map) object).entrySet().iterator();
 			while (collectionMap.hasNext()) {
-				Map.Entry<Object, Object> object = collectionMap.next();
-				System.out.println(object);
+				Map.Entry<Object, Object> obj = collectionMap.next();
+				System.out.println(obj);
 			}
-		} else if (collection instanceof List || collection instanceof Set || collection instanceof Queue) {
-			Iterator iterator = collection.iterator();
+		} else if (object instanceof List || object instanceof Set || object instanceof Queue) {
+			Iterator iterator = object.iterator();
 			while (iterator.hasNext()) {
-				Object object = iterator.next();
-				System.out.println(object);
+				Object obj = iterator.next();
+				System.out.println(obj);
 			}
 		} else {
 			throw new UnsupportedDataTypeException(
@@ -166,242 +168,6 @@ public class TraceLogUtils {
 		}
 
 		return null;
-	}
-
-	/**
-	 * 
-	 * @param object
-	 * @return
-	 * @throws NoSuchFieldException
-	 * @throws IllegalAccessException
-	 * @throws NullPointerException
-	 * @throws UnsupportedDataTypeException
-	 * @throws IllegalArgumentException
-	 */
-	public static <T> String convertObjectToString(T object) throws NoSuchFieldException, IllegalAccessException,
-			NullPointerException, UnsupportedDataTypeException, IllegalArgumentException {
-
-		StringBuilder res = new StringBuilder("");
-		Field[] fields = object.getClass().getDeclaredFields();
-		String key, value;
-		int i, fieldLength = fields.length;
-
-		for (i = 0; i < fieldLength; i++) {
-			key = fields[i].getName().toString();
-			Field field = object.getClass().getDeclaredField(key);
-			// can be check Modifier.isPrivate(method.getModifiers())
-			field.setAccessible(true);
-
-			if (field.getType().isArray()) {
-
-				if (field.get(object) != null && isJavaLangObject(field.get(object))) {
-					T[] listOjectJavaLang = (T[]) field.get(object);
-					if (listOjectJavaLang == null) {
-						value = "null";
-					} else {
-						value = TraceLogConstants.REGEX_ARRAY_OPEN_PARRENTHESES;
-						for (T obj : listOjectJavaLang) {
-							value += obj == null ? "" : obj.toString() + ", ";
-						}
-						int length = value.length();
-						value = value.substring(0, (length < 2 ? 2 : length) - 2)
-								+ TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES;
-					}
-
-					res = res.append("`" + key + "`".concat(" : \"" + value + "\"").concat(", "));
-				} else {
-					/**
-					 * Using recursive to get object in list object ...
-					 */
-					Object[] listOjectJavaLang = (Object[]) field.get(object);
-					if (listOjectJavaLang == null) {
-						value = "[]";
-					} else {
-						value = TraceLogConstants.REGEX_ARRAY_OPEN_PARRENTHESES;
-						for (Object obj : listOjectJavaLang) {
-							value += TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES + convertObjectToString(obj)
-									+ TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES + ", ";
-						}
-						int length = value.length();
-						value = value.substring(0, (length < 2 ? 2 : length) - 2)
-								+ TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES;
-						res = res.append("`" + key + "`".concat(" : \"" + value + "\"").concat(", "));
-					}
-				}
-			} else {
-
-				if (field.get(object) != null && field.getType() != null
-						&& isJavaUtilCollection(field.getType().getName())) {
-					Collection<?> collection = (Collection<?>) field.get(object);
-
-					if (collection instanceof Map) {
-						Iterator<Map.Entry<T, T>> collectionMap = ((Map) collection).entrySet().iterator();
-
-						value = TraceLogConstants.REGEX_ARRAY_OPEN_PARRENTHESES;
-						while (collectionMap.hasNext()) {
-							Map.Entry<T, T> obj = collectionMap.next();
-							T keyMap = obj.getKey();
-							T valueMap = obj.getValue();
-
-							value += TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES + "@<key>@ : ";
-							/**
-							 * Check key value is array or not
-							 */
-							if (keyMap != null && keyMap.getClass().isArray()) {
-								T[] listOjectJavaLang = (T[]) keyMap;
-								value += TraceLogConstants.REGEX_ARRAY_OPEN_PARRENTHESES;
-								if (isJavaLangObject(keyMap)) {
-									for (T langObject : listOjectJavaLang) {
-										value += langObject == null ? "" : langObject.toString() + ", ";
-									}
-								} else {
-									for (T langObject : listOjectJavaLang) {
-										value += langObject == null ? ""
-												: TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES
-														+ convertObjectToString(langObject)
-														+ TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES;
-										;
-									}
-								}
-
-								int length = value.length();
-								value = value.substring(0, (length < 2 ? 2 : length) - 2)
-										+ TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES;
-							} else {
-								if (keyMap == null) {
-									value += "null";
-								} else {
-									if (!isJavaLangObject(keyMap)) {
-										value += TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES
-												+ convertObjectToString(keyMap)
-												+ TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES;
-									} else if (keyMap instanceof List || keyMap instanceof Set
-											|| keyMap instanceof Queue) {
-										Iterator iterator = ((Collection<?>) keyMap).iterator();
-										value += TraceLogConstants.REGEX_ARRAY_OPEN_PARRENTHESES;
-										while (iterator.hasNext()) {
-											Object collectionObject = iterator.next();
-											if (isJavaLangObject(collectionObject)) {
-												value += field.get(collectionObject) == null ? ""
-														: field.get(collectionObject).toString();
-											} else {
-												value += field.get(collectionObject) == null ? ""
-														: TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES
-																+ convertObjectToString(collectionObject)
-																+ TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES;
-												;
-											}
-										}
-										value += TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES;
-									} else {
-										value += keyMap.toString();
-									}
-								}
-							}
-
-							value += TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES + ", @<value>@ : "
-									+ TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES;
-
-							if (valueMap != null && valueMap.getClass().isArray()) {
-								T[] listOjectJavaLang = (T[]) valueMap;
-								value += TraceLogConstants.REGEX_ARRAY_OPEN_PARRENTHESES;
-								if (isJavaLangObject(valueMap)) {
-									for (T langObject : listOjectJavaLang) {
-										value += langObject == null ? "" : langObject.toString() + ", ";
-									}
-								} else {
-									for (T langObject : listOjectJavaLang) {
-										value += langObject == null ? ""
-												: TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES
-														+ convertObjectToString(langObject)
-														+ TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES;
-										;
-									}
-								}
-
-								int length = value.length();
-								value += value.substring(0, (length < 2 ? 2 : length) - 2)
-										+ TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES;
-							} else {
-								if (valueMap == null) {
-									value += "null";
-								} else {
-									if (!isJavaLangObject(valueMap)) {
-										value += TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES
-												+ convertObjectToString(valueMap)
-												+ TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES;
-									} else if (valueMap instanceof List || valueMap instanceof Set
-											|| valueMap instanceof Queue) {
-										Iterator iterator = ((Collection<?>) valueMap).iterator();
-										value += TraceLogConstants.REGEX_ARRAY_OPEN_PARRENTHESES;
-										while (iterator.hasNext()) {
-											Object collectionObject = iterator.next();
-											if (isJavaLangObject(collectionObject)) {
-												value += field.get(collectionObject) == null ? ""
-														: field.get(collectionObject).toString();
-											} else {
-												value += field.get(collectionObject) == null ? ""
-														: TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES
-																+ convertObjectToString(collectionObject)
-																+ TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES;
-												;
-											}
-										}
-										value += TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES;
-									} else {
-										value += valueMap.toString();
-									}
-								}
-							}
-
-							value += TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES;
-						}
-
-						value += TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES;
-						res = res.append("`" + key + "`".concat(" : \"" + value + "\"").concat(", "));
-					} else if (collection instanceof List || collection instanceof Set || collection instanceof Queue) {
-						Iterator iterator = collection.iterator();
-						value = TraceLogConstants.REGEX_ARRAY_OPEN_PARRENTHESES;
-						while (iterator.hasNext()) {
-							Object obj = iterator.next();
-							if (isJavaLangObject(obj)) {
-								value += field.get(object) == null ? "" : field.get(object).toString();
-								res = res.append("`" + key + "`".concat(" : \"" + value + "\"").concat(", "));
-							} else {
-								value += field.get(object) == null ? ""
-										: TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES + convertObjectToString(obj)
-												+ TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES;
-								;
-							}
-						}
-
-						value += TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES;
-						res = res.append("`" + key + "`".concat(" : \"" + value + "\"").concat(", "));
-					} else {
-						throw new UnsupportedDataTypeException(
-								"Not support for type " + collection.getClass().getName() + " collection.");
-					}
-
-				} else if (field.get(object) != null && isJavaLangObject(field.get(object))) {
-					value = field.get(object) == null ? "null" : field.get(object).toString();
-					res = res.append("`" + key + "`".concat(" : \"" + value + "\"").concat(", "));
-				} else {
-					/**
-					 * Using recursive to get object in object ...
-					 */
-					value = field.get(object) == null ? "null"
-							: TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES
-									+ convertObjectToString(field.get(object))
-									+ TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES;
-					res = res.append("`" + key + "`".concat(" : \"" + value + "\"").concat(", "));
-				}
-			}
-
-			field.setAccessible(false);
-		}
-
-		int length = res.toString().length();
-		return res.toString().substring(0, (length < 2 ? 2 : length) - 2);
 	}
 
 	/**
@@ -610,4 +376,100 @@ public class TraceLogUtils {
 				.concat(putValueOnSingle(key, value)).concat(TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES));
 		return res.toString();
 	}
+
+	/**
+	 * 
+	 * @param object
+	 * @return
+	 * @throws NoSuchFieldException
+	 * @throws IllegalAccessException
+	 * @throws NullPointerException
+	 * @throws UnsupportedDataTypeException
+	 * @throws IllegalArgumentException
+	 */
+	public static <T> String convertObjectToString(T object) throws NoSuchFieldException, IllegalAccessException,
+			NullPointerException, UnsupportedDataTypeException, IllegalArgumentException {
+		StringBuilder res = new StringBuilder("");
+		Field[] fields = object.getClass().getDeclaredFields();
+		String key, value;
+		int i, fieldLength = fields.length, position = 0;
+		Object[] transferObjectListToArray = null;
+		boolean isArray;
+
+		for (i = 0; i < fieldLength; i++) {
+			key = fields[i].getName().toString();
+			Field field = object.getClass().getDeclaredField(key);
+			position = 0;
+			isArray = false;
+			// can be check Modifier.isPrivate(method.getModifiers())
+			field.setAccessible(true);
+			if (field.getType().isArray()) {
+				isArray = true;
+				transferObjectListToArray = (Object[]) field.get(object);
+			} else {
+
+				if (field.get(object) != null && field.getType() != null
+						&& isJavaUtilCollection(field.getType().getName())) {
+					isArray = true;
+					if (field.getType().getName().equals("java.util.Map")) {
+						Map<Object, Object> collection = (Map<Object, Object>) field.get(object);
+						transferObjectListToArray = new Object[collection.size()];
+
+						Iterator<Entry<Object, Object>> iterator = collection.entrySet().iterator();
+						TransferMapToObject[] mapToObject = new TransferMapToObject[collection.size()];
+						while (iterator.hasNext()) {
+							Map.Entry<Object, Object> obj = iterator.next();
+							mapToObject[position] = new TransferMapToObject(obj.getKey(), obj.getValue());
+							transferObjectListToArray[position] = mapToObject[position++];
+						}
+					} else {
+						Collection<Object> collection = (Collection<Object>) field.get(object);
+						transferObjectListToArray = new Object[collection.size()];
+						if (collection instanceof List || collection instanceof Set || collection instanceof Queue) {
+							Iterator iterator = collection.iterator();
+							while (iterator.hasNext()) {
+								Object obj = iterator.next();
+								transferObjectListToArray[position++] = obj;
+							}
+						}
+					}
+				} else {
+					isArray = false;
+					transferObjectListToArray = new Object[] { field.get(object) };
+				}
+			}
+
+			field.setAccessible(false);
+
+			// set to string
+			if (transferObjectListToArray != null) {
+				value = isArray ? TraceLogConstants.REGEX_ARRAY_OPEN_PARRENTHESES : "";
+				for (Object obj : transferObjectListToArray) {
+					if (obj != null && !isJavaLangObject(obj)) {
+						if (!obj.getClass().isArray()) {
+							value += TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES;
+						}
+						value += convertObjectToString(obj) + TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES + ", ";
+					} else {
+						if (obj != null) {
+							value += obj.toString() + ", ";
+						} else {
+							value += "null, ";
+						}
+					}
+				}
+			} else {
+				value = isArray ? TraceLogConstants.REGEX_ARRAY_OPEN_PARRENTHESES : "null";
+			}
+
+			int length = value.length();
+			value = value.substring(0, length < 2 ? length : length - 2);
+			value += isArray ? TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES : "";
+			res = res.append("`" + key + "`".concat(" : \"" + value + "\"").concat(", "));
+		}
+
+		int length = res.toString().length();
+		return res.toString().substring(0, (length < 2 ? 2 : length) - 2);
+	}
+
 }

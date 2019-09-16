@@ -286,7 +286,18 @@ public class ConsoleLogImpl implements ConsoleLog {
 
 	@Override
 	public <E> void logWarning(String warning, E... arg) {
-		System.out.println("E0" + arg.getClass().isArray());
+		
+//		Object t = new String[] {"fsdfsdf", "fsfsdfsdf"};
+//		System.out.println(t.getClass().isArray());
+//		
+//		Object c = new String("fsdfsdf");
+//		System.out.println(c.getClass().isArray());
+		
+//		for(int index = 0; index < arg.length; index++) {
+//			System.out.println("Value " + arg.getClass().getTypeName());
+//		}
+//		
+//		System.out.println("E0" + arg.getClass().isArray());
 		
 	}
 
