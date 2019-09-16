@@ -142,25 +142,25 @@ public class TraceLogUtils {
 
 	/**
 	 * 
-	 * @param collection
+	 * @param object
 	 * @return
 	 * @throws UnsupportedDataTypeException
 	 * @throws NullPointerException
 	 */
-	public static String[] convertCollectionTypeToString(Collection<?> collection)
+	public static String[] convertCollectionTypeToString(Object object)
 			throws UnsupportedDataTypeException, NullPointerException {
 
-		if (collection instanceof Map) {
-			Iterator<Map.Entry<Object, Object>> collectionMap = ((Map) collection).entrySet().iterator();
+		if (object instanceof Map) {
+			Iterator<Map.Entry<Object, Object>> collectionMap = ((Map) object).entrySet().iterator();
 			while (collectionMap.hasNext()) {
-				Map.Entry<Object, Object> object = collectionMap.next();
-				System.out.println(object);
+				Map.Entry<Object, Object> obj = collectionMap.next();
+				System.out.println(obj);
 			}
-		} else if (collection instanceof List || collection instanceof Set || collection instanceof Queue) {
-			Iterator iterator = collection.iterator();
+		} else if (object instanceof List || object instanceof Set || object instanceof Queue) {
+			Iterator iterator = object.iterator();
 			while (iterator.hasNext()) {
-				Object object = iterator.next();
-				System.out.println(object);
+				Object obj = iterator.next();
+				System.out.println(obj);
 			}
 		} else {
 			throw new UnsupportedDataTypeException(
@@ -446,7 +446,10 @@ public class TraceLogUtils {
 				value = isArray ? TraceLogConstants.REGEX_ARRAY_OPEN_PARRENTHESES : "";
 				for (Object obj : transferObjectListToArray) {
 					if (obj != null && !isJavaLangObject(obj)) {
-						value += convertObjectToString(obj) + ", ";
+						if (!obj.getClass().isArray()) {
+							value += TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES;
+						}
+						value += convertObjectToString(obj) + TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES + ", ";
 					} else {
 						if (obj != null) {
 							value += obj.toString() + ", ";
