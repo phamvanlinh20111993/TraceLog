@@ -3,6 +3,8 @@
  */
 package tracelog.phamlinh.example.object;
 
+import java.util.List;
+
 /**
  * @author PhamVanLinh
  *
@@ -18,6 +20,10 @@ public class KeyPairValue {
 	private RegexCondition testObject;
 	
 	private RegexCondition[] testLisObject;
+	
+	private List<Integer> testCollectionObject;
+	
+	private List<RegexCondition> testListCollectionObject;
 	
 	/**
 	 * 
@@ -175,5 +181,49 @@ public class KeyPairValue {
 		this.testLisObject = testLisObject;
 	}
 
+	/**
+	 * @param testListCollectionObject
+	 */
+	public KeyPairValue(List<RegexCondition> testListCollectionObject) {
+		super();
+		this.testListCollectionObject = testListCollectionObject;
+	}
+
+	/**
+	 * @param testCollectionObject
+	 */
+	public KeyPairValue(String value, List<Integer> testCollectionObject) {
+		super();
+		this.value = value;
+		this.testCollectionObject = testCollectionObject;
+	}
+
+	/**
+	 * @return the testCollectionObject
+	 */
+	public List<Integer> getTestCollectionObject() {
+		return testCollectionObject;
+	}
+
+	/**
+	 * @param testCollectionObject the testCollectionObject to set
+	 */
+	public void setTestCollectionObject(List<Integer> testCollectionObject) {
+		this.testCollectionObject = testCollectionObject;
+	}
+
+	/**
+	 * @return the testListCollectionObject
+	 */
+	public List<RegexCondition> getTestListCollectionObject() {
+		return testListCollectionObject;
+	}
+
+	/**
+	 * @param testListCollectionObject the testListCollectionObject to set
+	 */
+	public void setTestListCollectionObject(List<RegexCondition> testListCollectionObject) {
+		this.testListCollectionObject = testListCollectionObject;
+	}
 	
 }

@@ -286,7 +286,8 @@ public class ConsoleLogImpl implements ConsoleLog {
 
 	@Override
 	public <E> void logWarning(String warning, E... arg) {
-
+		System.out.println("E0" + arg.getClass().isArray());
+		
 	}
 
 	@Override
