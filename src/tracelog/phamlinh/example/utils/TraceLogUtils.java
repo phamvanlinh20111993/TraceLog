@@ -12,7 +12,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
 import java.util.TreeMap;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,7 +56,8 @@ public class TraceLogUtils {
 	public static <E> boolean isJavaUtilCollection(String check) {
 		return check.matches("^java\\.util\\.(?:" + TraceLogConstants.COLLECTION_TYPE_LIST + "|"
 				+ TraceLogConstants.COLLECTION_TYPE_MAP + "|" + TraceLogConstants.COLLECTION_TYPE_QUEUE + "|"
-				+ TraceLogConstants.COLLECTION_TYPE_SET + ")$");
+				+ TraceLogConstants.COLLECTION_TYPE_QUEUE + "|" + TraceLogConstants.COLLECTION_TYPE_STACK + "|"
+				+ TraceLogConstants.COLLECTION_TYPE_VECTOR + ")$");
 	}
 
 	/**
@@ -138,36 +141,6 @@ public class TraceLogUtils {
 		}
 
 		return getOrderPrefix;
-	}
-
-	/**
-	 * 
-	 * @param object
-	 * @return
-	 * @throws UnsupportedDataTypeException
-	 * @throws NullPointerException
-	 */
-	public static String[] convertCollectionTypeToString(Object object)
-			throws UnsupportedDataTypeException, NullPointerException {
-
-		if (object instanceof Map) {
-			Iterator<Map.Entry<Object, Object>> collectionMap = ((Map) object).entrySet().iterator();
-			while (collectionMap.hasNext()) {
-				Map.Entry<Object, Object> obj = collectionMap.next();
-				System.out.println(obj);
-			}
-		} else if (object instanceof List || object instanceof Set || object instanceof Queue) {
-			Iterator iterator = object.iterator();
-			while (iterator.hasNext()) {
-				Object obj = iterator.next();
-				System.out.println(obj);
-			}
-		} else {
-			throw new UnsupportedDataTypeException(
-					"Not support for type " + collection.getClass().getName() + " collection.");
-		}
-
-		return null;
 	}
 
 	/**
@@ -392,12 +365,12 @@ public class TraceLogUtils {
 		StringBuilder res = new StringBuilder("");
 		Field[] fields = object.getClass().getDeclaredFields();
 		String key, value;
-		int i, fieldLength = fields.length, position = 0;
+		int index, fieldLength = fields.length, position = 0;
 		Object[] transferObjectListToArray = null;
 		boolean isArray;
 
-		for (i = 0; i < fieldLength; i++) {
-			key = fields[i].getName().toString();
+		for (index = 0; index < fieldLength; index++) {
+			key = fields[index].getName().toString();
 			Field field = object.getClass().getDeclaredField(key);
 			position = 0;
 			isArray = false;
@@ -411,6 +384,7 @@ public class TraceLogUtils {
 				if (field.get(object) != null && field.getType() != null
 						&& isJavaUtilCollection(field.getType().getName())) {
 					isArray = true;
+					// special case Map isnt collection in java 8
 					if (field.getType().getName().equals("java.util.Map")) {
 						Map<Object, Object> collection = (Map<Object, Object>) field.get(object);
 						transferObjectListToArray = new Object[collection.size()];
@@ -425,12 +399,16 @@ public class TraceLogUtils {
 					} else {
 						Collection<Object> collection = (Collection<Object>) field.get(object);
 						transferObjectListToArray = new Object[collection.size()];
-						if (collection instanceof List || collection instanceof Set || collection instanceof Queue) {
+						if (collection instanceof List || collection instanceof Set 
+								|| collection instanceof Queue || collection instanceof Stack 
+								|| collection instanceof Vector) {
 							Iterator iterator = collection.iterator();
 							while (iterator.hasNext()) {
 								Object obj = iterator.next();
 								transferObjectListToArray[position++] = obj;
 							}
+						}else {
+							throw new UnsupportedDataTypeException("Do not support for type " + field.getType());
 						}
 					}
 				} else {
@@ -451,11 +429,7 @@ public class TraceLogUtils {
 						}
 						value += convertObjectToString(obj) + TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES + ", ";
 					} else {
-						if (obj != null) {
-							value += obj.toString() + ", ";
-						} else {
-							value += "null, ";
-						}
+						value += (obj != null ? obj.toString(): "null") + ", ";
 					}
 				}
 			} else {
