@@ -1,6 +1,7 @@
 package tracelog.phamlinh.example.utils;
 
 import java.lang.reflect.Field;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,6 +28,8 @@ public class TraceLogUtils {
 
 	public static final String FORMAT_DATE_HHMMSS = "HH:mm:ss";
 	public static final String FORMAT_DATE_YYYYMMDDHHMMSSA = "yyyy-MM-dd hh:mm:ss a";
+	public static final Integer MAX_PREVIOUS_DECIMAL_POINT = 100;
+	public static final Integer MAX_AFTER_DECIMAL_POINT = 100;
 
 	/**
 	 * 
@@ -76,10 +79,23 @@ public class TraceLogUtils {
 	 * @param total
 	 * @return
 	 */
-	public static String preStart(String string, String loop, Integer total) {
+	public static String repeatStart(String string, String loop, Integer total) {
 		return total < 1 ? string
-				: TraceLogUtils.isEmpty(string) ? "" + loop + preStart(string, loop, total - 1)
-						: loop + preStart(string, loop, total - 1);
+				: TraceLogUtils.isEmpty(string) ? "" + loop + repeatStart(string, loop, total - 1)
+						: loop + repeatStart(string, loop, total - 1);
+	}
+
+	/**
+	 * 
+	 * @param string
+	 * @param loop
+	 * @param total
+	 * @return
+	 */
+	public static String repeatEnd(String string, String loop, Integer total) {
+		return total < 1 ? string
+				: TraceLogUtils.isEmpty(string) ? "" + repeatEnd(string, loop, total - 1) + loop
+						: repeatEnd(string, loop, total - 1) + loop;
 	}
 
 	/**
@@ -92,13 +108,39 @@ public class TraceLogUtils {
 	 */
 	public static String addPrefixNumber(Number number, Integer previouDecimalPoint, Integer afterDecimalPoint)
 			throws UnsupportedDataTypeException, NullPointerException {
-		if (number instanceof Integer && previouDecimalPoint > 0 && afterDecimalPoint > 0) {
-			throw new UnsupportedDataTypeException("Unsupported for type Integer");
-		} else if (number instanceof Float) {
+		String res = "";
+		if ((number instanceof Integer || number instanceof Long || number instanceof Short || number instanceof Byte)
+				&& (previouDecimalPoint > 0 || afterDecimalPoint > 0)) {
+			throw new UnsupportedDataTypeException("Unsupported for type Integer, Long, Short, Byte. ");
+		} else if (!(number instanceof Integer || number instanceof Long || number instanceof Short)
+				&& (previouDecimalPoint > 0 || afterDecimalPoint > 0)) {
 
+			previouDecimalPoint = previouDecimalPoint > MAX_PREVIOUS_DECIMAL_POINT ? MAX_PREVIOUS_DECIMAL_POINT
+					: previouDecimalPoint;
+			afterDecimalPoint = afterDecimalPoint > MAX_AFTER_DECIMAL_POINT ? MAX_AFTER_DECIMAL_POINT
+					: afterDecimalPoint;
+
+			if (number instanceof Float || number instanceof Double) {
+
+				String formattingFloatingPoint = "";
+
+				if (previouDecimalPoint <= 25 || afterDecimalPoint <= 25) {
+					formattingFloatingPoint = repeatStart("", "#", previouDecimalPoint) + "."
+							+ repeatStart("", "#", afterDecimalPoint);
+					DecimalFormat formatDecimal = new DecimalFormat(formattingFloatingPoint);
+					res = formatDecimal.format(number);
+				} else {
+					formattingFloatingPoint = "%" + previouDecimalPoint + "." + afterDecimalPoint + "f";
+					res = String.format(formattingFloatingPoint, number);
+				}
+			} else {
+				throw new UnsupportedDataTypeException("Unsupported for type " + number.getClass().getTypeName());
+			}
+		} else {
+			res = number.toString();
 		}
 
-		return null;
+		return res;
 	}
 
 	/**
@@ -165,12 +207,8 @@ public class TraceLogUtils {
 			if (!TraceLogUtils.isJavaLangObject(argument)) {
 				response.add(convertObjectToString(argument));
 			} else {
-				if (argument instanceof Integer) {
-					response.add(Integer.toString((Integer) argument));
-				} else if (argument instanceof Float) {
-					response.add(Float.toString((Float) argument));
-				} else if (argument instanceof Double) {
-					response.add(Double.toString((Double) argument));
+				if (argument instanceof Number) {
+					response.add(TraceLogUtils.addPrefixNumber((Number) argument, 0, 0));
 				} else if (argument instanceof String) {
 					response.add((String) argument);
 				} else if (argument instanceof Character) {
@@ -205,12 +243,8 @@ public class TraceLogUtils {
 		if (!TraceLogUtils.isJavaLangObject(argument)) {
 			response.add(convertObjectToString(argument));
 		} else {
-			if (argument instanceof Integer) {
-				response.add(Integer.toString((Integer) argument));
-			} else if (argument instanceof Float) {
-				response.add(Float.toString((Float) argument));
-			} else if (argument instanceof Double) {
-				response.add(Double.toString((Double) argument));
+			if (argument instanceof Number) {
+				response.add(TraceLogUtils.addPrefixNumber((Number) argument, 0, 0));
 			} else if (argument instanceof String) {
 				response.add((String) argument);
 			} else if (argument instanceof Character) {
@@ -275,7 +309,7 @@ public class TraceLogUtils {
 			break;
 		// update version
 		case TraceLogConstants.REGEX_TYPE_FLOAT_NUMBER:
-			res = object instanceof Double;
+			res = object instanceof Float;
 			break;
 		case TraceLogConstants.REGEX_TYPE_DOUBLE_NUMBER:
 			res = object instanceof Double;
@@ -291,6 +325,12 @@ public class TraceLogUtils {
 			break;
 		case TraceLogConstants.COLLECTION_TYPE_QUEUE:
 			res = object instanceof Queue<?>;
+			break;
+		case TraceLogConstants.COLLECTION_TYPE_VECTOR:
+			res = object instanceof Vector<?>;
+			break;
+		case TraceLogConstants.COLLECTION_TYPE_STACK:
+			res = object instanceof Stack<?>;
 			break;
 		default:
 			res = false;
@@ -399,15 +439,14 @@ public class TraceLogUtils {
 					} else {
 						Collection<Object> collection = (Collection<Object>) field.get(object);
 						transferObjectListToArray = new Object[collection.size()];
-						if (collection instanceof List || collection instanceof Set 
-								|| collection instanceof Queue || collection instanceof Stack 
-								|| collection instanceof Vector) {
+						if (collection instanceof List || collection instanceof Set || collection instanceof Queue
+								|| collection instanceof Stack || collection instanceof Vector) {
 							Iterator iterator = collection.iterator();
 							while (iterator.hasNext()) {
 								Object obj = iterator.next();
 								transferObjectListToArray[position++] = obj;
 							}
-						}else {
+						} else {
 							throw new UnsupportedDataTypeException("Do not support for type " + field.getType());
 						}
 					}
@@ -429,7 +468,7 @@ public class TraceLogUtils {
 						}
 						value += convertObjectToString(obj) + TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES + ", ";
 					} else {
-						value += (obj != null ? obj.toString(): "null") + ", ";
+						value += (obj != null ? obj.toString() : "null") + ", ";
 					}
 				}
 			} else {

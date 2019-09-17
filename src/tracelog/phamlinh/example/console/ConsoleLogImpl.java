@@ -3,8 +3,6 @@ package tracelog.phamlinh.example.console;
 import java.rmi.NoSuchObjectException;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.activation.UnsupportedDataTypeException;
 
@@ -286,19 +284,19 @@ public class ConsoleLogImpl implements ConsoleLog {
 
 	@Override
 	public <E> void logWarning(String warning, E... arg) {
-		
-//		Object t = new String[] {"fsdfsdf", "fsfsdfsdf"};
-//		System.out.println(t.getClass().isArray());
-//		
-//		Object c = new String("fsdfsdf");
-//		System.out.println(c.getClass().isArray());
-		
-//		for(int index = 0; index < arg.length; index++) {
-//			System.out.println("Value " + arg.getClass().getTypeName());
-//		}
-//		
-//		System.out.println("E0" + arg.getClass().isArray());
-		
+
+		// Object t = new String[] {"fsdfsdf", "fsfsdfsdf"};
+		// System.out.println(t.getClass().isArray());
+		//
+		// Object c = new String("fsdfsdf");
+		// System.out.println(c.getClass().isArray());
+
+		// for(int index = 0; index < arg.length; index++) {
+		// System.out.println("Value " + arg.getClass().getTypeName());
+		// }
+		//
+		// System.out.println("E0" + arg.getClass().isArray());
+
 	}
 
 	@Override
