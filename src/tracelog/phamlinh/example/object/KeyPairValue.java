@@ -15,19 +15,19 @@ public class KeyPairValue {
 	private String value;
 	private String type;
 	private String key;
-	
+
 	private Integer[] test;
 
 	private RegexCondition testObject;
-	
+
 	private RegexCondition[] testLisObject;
-	
+
 	private List<Integer> testCollectionObject;
-	
+
 	private List<RegexCondition> testListCollectionObject;
-	
+
 	private Map<String, RegexCondition> valueTestMap;
-	
+
 	/**
 	 * 
 	 */
@@ -45,8 +45,6 @@ public class KeyPairValue {
 		this.value = value;
 
 	}
-	
-	
 
 	/**
 	 * @param value
@@ -160,7 +158,8 @@ public class KeyPairValue {
 	}
 
 	/**
-	 * @param test the test to set
+	 * @param test
+	 *            the test to set
 	 */
 	public void setTest(Integer[] test) {
 		this.test = test;
@@ -174,7 +173,8 @@ public class KeyPairValue {
 	}
 
 	/**
-	 * @param testObject the testObject to set
+	 * @param testObject
+	 *            the testObject to set
 	 */
 	public void setTestObject(RegexCondition testObject) {
 		this.testObject = testObject;
@@ -188,7 +188,8 @@ public class KeyPairValue {
 	}
 
 	/**
-	 * @param testLisObject the testLisObject to set
+	 * @param testLisObject
+	 *            the testLisObject to set
 	 */
 	public void setTestLisObject(RegexCondition[] testLisObject) {
 		this.testLisObject = testLisObject;
@@ -219,7 +220,8 @@ public class KeyPairValue {
 	}
 
 	/**
-	 * @param testCollectionObject the testCollectionObject to set
+	 * @param testCollectionObject
+	 *            the testCollectionObject to set
 	 */
 	public void setTestCollectionObject(List<Integer> testCollectionObject) {
 		this.testCollectionObject = testCollectionObject;
@@ -233,7 +235,8 @@ public class KeyPairValue {
 	}
 
 	/**
-	 * @param testListCollectionObject the testListCollectionObject to set
+	 * @param testListCollectionObject
+	 *            the testListCollectionObject to set
 	 */
 	public void setTestListCollectionObject(List<RegexCondition> testListCollectionObject) {
 		this.testListCollectionObject = testListCollectionObject;
@@ -247,12 +250,11 @@ public class KeyPairValue {
 	}
 
 	/**
-	 * @param valueTestMap the valueTestMap to set
+	 * @param valueTestMap
+	 *            the valueTestMap to set
 	 */
 	public void setValueTestMap(Map<String, RegexCondition> valueTestMap) {
 		this.valueTestMap = valueTestMap;
 	}
-	
-	
-	
+
 }

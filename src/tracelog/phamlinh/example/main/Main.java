@@ -1,5 +1,6 @@
 package tracelog.phamlinh.example.main;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -71,6 +72,23 @@ public class Main {
 		Map<String, String> abc = new HashMap<>();
 		abc.put("fas", "gdfdgdf");
 		System.out.println("check " + TraceLogUtils.isJavaUtilObject(test));
+		
+//		Double numb = 1222222222222222222222222222223333333333331.433333333333333d;
+//		System.out.println("number is " + numb);
+//		String format = String.format("%34.4444442f", numb);
+//		System.out.println("After format " + format);
+		
+		
+		Double numb = 122222.43333344444444444444433333d;
+		System.out.println("number is " + numb);
+		DecimalFormat df = new DecimalFormat("###################################.###############################################");
+		String format = df.format(numb);
+		System.out.println("After format " + format);
+		
+		Number s = new Float(300.23423);
+		System.out.println(s.toString());
 	
+		
+		//System.out.println(TraceLogUtils.repeatStart("hhe", ".", 3000));
 	}
 }
