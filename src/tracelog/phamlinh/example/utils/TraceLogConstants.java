@@ -16,7 +16,7 @@ public class TraceLogConstants {
 	public final static String REGEX_ARGUMENT = "ag"; // {}
 	public final static String REGEX_TYPE_ARGUMENT = "Argument";
 
-	public final static String REGEX_NUMBER = "n(?:(\\d+)?\\.(\\d+)?)?"; // ${}
+	public final static String REGEX_NUMBER = "n(?:(\\d+)?\\.(\\d+))?(?:d|f)?"; // ${}
 	public final static String REGEX_TYPE_NUMBER = "Number";
 
 	public final static String REGEX_FLOAT_NUMBER = "n(?:(\\d+)?\\.(\\d+)?)?f"; // ${}
@@ -24,9 +24,6 @@ public class TraceLogConstants {
 
 	public final static String REGEX_DOUBLE_NUMBER = "n(?:(\\d+)?\\.(\\d+)?)?d"; // ${}
 	public final static String REGEX_TYPE_DOUBLE_NUMBER = "Double";
-	
-	public final static String REGEX_LONG_NUMBER = "n(?:(\\d+)?\\.(\\d+)?)?l"; // ${}
-	public final static String REGEX_TYPE_LONG_NUMBER = "Long";
 
 	public final static String REGEX_STRING = "s"; // ""
 	public final static String REGEX_TYPE_STRING = "String";
@@ -51,13 +48,13 @@ public class TraceLogConstants {
 	public final static String REGEX_PREFIX = "\\%\\%";
 
 	public final static String[] REGEX_LIST = { REGEX_VALUE, REGEX_ARGUMENT, REGEX_CHAR, REGEX_OBJECT, REGEX_BOOLEAN,
-			REGEX_NUMBER, REGEX_STRING, REGEX_FLOAT_NUMBER, REGEX_TYPE_DOUBLE_NUMBER, REGEX_LONG_NUMBER };
+			REGEX_NUMBER, REGEX_STRING, REGEX_FLOAT_NUMBER, REGEX_TYPE_DOUBLE_NUMBER };
 	public final static String[] REGEX_TYPE = { REGEX_TYPE_VALUE, REGEX_TYPE_ARGUMENT, REGEX_TYPE_CHAR,
 			REGEX_TYPE_OBJECT, REGEX_TYPE_BOOLEAN, REGEX_TYPE_NUMBER, REGEX_TYPE_STRING, REGEX_TYPE_FLOAT_NUMBER,
-			REGEX_TYPE_DOUBLE_NUMBER, REGEX_TYPE_LONG_NUMBER };
+			REGEX_TYPE_DOUBLE_NUMBER };
 
 	/**
-	 *  check parameter on list
+	 * check parameter on list
 	 */
 	public final static String COLLECTION_TYPE_LIST = "List";
 
@@ -66,11 +63,9 @@ public class TraceLogConstants {
 	public final static String COLLECTION_TYPE_MAP = "Map";
 
 	public final static String COLLECTION_TYPE_QUEUE = "Queue";
-	
+
 	public final static String COLLECTION_TYPE_VECTOR = "Vector";
 
 	public final static String COLLECTION_TYPE_STACK = "Stack";
-	
-	
 
 }

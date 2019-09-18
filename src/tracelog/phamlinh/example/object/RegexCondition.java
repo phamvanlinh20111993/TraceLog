@@ -1,19 +1,18 @@
 package tracelog.phamlinh.example.object;
 
 public class RegexCondition {
-	
+
 	private String regex; // $${ag}
 	private boolean isArray; // true else object
 	private String type;// argument
 	private String signalPrefix; // ag
 	private String format;
-	
+
 	private String naturePath;// only using for number
 	private String decimal;
-	
 
-	public RegexCondition() {}
-
+	public RegexCondition() {
+	}
 
 	/**
 	 * @param regex
@@ -30,7 +29,6 @@ public class RegexCondition {
 		this.signalPrefix = signalPrefix;
 		this.format = format;
 	}
-
 
 	/**
 	 * @param regex
@@ -53,7 +51,6 @@ public class RegexCondition {
 		this.decimal = decimal;
 	}
 
-
 	/**
 	 * @return the regex
 	 */
@@ -61,14 +58,13 @@ public class RegexCondition {
 		return regex;
 	}
 
-
 	/**
-	 * @param regex the regex to set
+	 * @param regex
+	 *            the regex to set
 	 */
 	public void setRegex(String regex) {
 		this.regex = regex;
 	}
-
 
 	/**
 	 * @return the isArray
@@ -77,14 +73,13 @@ public class RegexCondition {
 		return isArray;
 	}
 
-
 	/**
-	 * @param isArray the isArray to set
+	 * @param isArray
+	 *            the isArray to set
 	 */
 	public void setArray(boolean isArray) {
 		this.isArray = isArray;
 	}
-
 
 	/**
 	 * @return the type
@@ -93,14 +88,13 @@ public class RegexCondition {
 		return type;
 	}
 
-
 	/**
-	 * @param type the type to set
+	 * @param type
+	 *            the type to set
 	 */
 	public void setType(String type) {
 		this.type = type;
 	}
-
 
 	/**
 	 * @return the signalPrefix
@@ -109,14 +103,13 @@ public class RegexCondition {
 		return signalPrefix;
 	}
 
-
 	/**
-	 * @param signalPrefix the signalPrefix to set
+	 * @param signalPrefix
+	 *            the signalPrefix to set
 	 */
 	public void setSignalPrefix(String signalPrefix) {
 		this.signalPrefix = signalPrefix;
 	}
-
 
 	/**
 	 * @return the format
@@ -125,14 +118,13 @@ public class RegexCondition {
 		return format;
 	}
 
-
 	/**
-	 * @param format the format to set
+	 * @param format
+	 *            the format to set
 	 */
 	public void setFormat(String format) {
 		this.format = format;
 	}
-
 
 	/**
 	 * @return the naturePath
@@ -141,14 +133,13 @@ public class RegexCondition {
 		return naturePath;
 	}
 
-
 	/**
-	 * @param naturePath the naturePath to set
+	 * @param naturePath
+	 *            the naturePath to set
 	 */
 	public void setNaturePath(String naturePath) {
 		this.naturePath = naturePath;
 	}
-
 
 	/**
 	 * @return the decimal
@@ -157,9 +148,9 @@ public class RegexCondition {
 		return decimal;
 	}
 
-
 	/**
-	 * @param decimal the decimal to set
+	 * @param decimal
+	 *            the decimal to set
 	 */
 	public void setDecimal(String decimal) {
 		this.decimal = decimal;
