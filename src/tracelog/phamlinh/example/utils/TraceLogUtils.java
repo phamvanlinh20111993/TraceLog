@@ -109,7 +109,6 @@ public class TraceLogUtils {
 	public static String addPrefixNumber(Number number, Integer previouDecimalPoint, Integer afterDecimalPoint)
 			throws UnsupportedDataTypeException, NullPointerException {
 		String res = "";
-		
 		if ((number instanceof Integer || number instanceof Long || number instanceof Short || number instanceof Byte)
 				&& (previouDecimalPoint > 0 || afterDecimalPoint > 0)) {
 			throw new UnsupportedDataTypeException("Unsupported for type " + number.getClass().getTypeName());
@@ -178,13 +177,16 @@ public class TraceLogUtils {
 		}
 
 		Pattern p = Pattern.compile(TraceLogConstants.REGEX_PREFIX.concat(prefixKey));
-		String naturePath = "0", decimalPath = "0";
+		String naturePath, decimalPath;
 		Matcher m = p.matcher(string);
+
 		while (m.find()) {
+			naturePath = "0";
+			decimalPath = "0";
 			if (m.groupCount() > 0) {
 				naturePath = m.group(1) != null ? m.group(1).toString() : naturePath;
 				decimalPath = m.group(2) != null ? m.group(2).toString() : decimalPath;
-		   }
+			}
 			getOrderPrefix.put(m.start(), new RegexCondition(m.group(), isArray, "", key, "", naturePath, decimalPath));
 		}
 
@@ -279,10 +281,15 @@ public class TraceLogUtils {
 		open = open == null ? "" : open;
 		close = close == null ? "" : close;
 		for (int index = 0; index < value.length - 1; index++) {
-			res = res.append(open + value[index].concat(close).concat(", "));
+			if (value[index] == "null") {
+				res = res.append(value[index].concat(", "));
+			} else {
+				res = res.append(open + value[index].concat(close).concat(", "));
+			}
 		}
 
-		return res.append(open + value[value.length - 1] + close).toString();
+		return value[value.length - 1] == "null" ? res.append(value[value.length - 1]).toString()
+				: res.append(open + value[value.length - 1] + close).toString();
 	}
 
 	/**
