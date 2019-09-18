@@ -6,7 +6,7 @@ import java.util.TreeMap;
 
 import javax.activation.UnsupportedDataTypeException;
 
-import tracelog.phamlinh.example.object.KeyPairValue;
+import tracelog.phamlinh.example.object.RegexCondition;
 import tracelog.phamlinh.example.utils.TraceLogConstants;
 import tracelog.phamlinh.example.utils.TraceLogUtils;
 
@@ -31,10 +31,10 @@ public class ConsoleLogImpl implements ConsoleLog {
 	 * @param key
 	 * @return
 	 */
-	private Map<Integer, KeyPairValue> getPrefixListOnString(String string) {
+	private Map<Integer, RegexCondition> getPrefixListOnString(String string) {
 
-		Map<Integer, KeyPairValue> getPosition = new TreeMap<Integer, KeyPairValue>();
-		Map<Integer, KeyPairValue> temp = new TreeMap<Integer, KeyPairValue>();
+		Map<Integer, RegexCondition> getPosition = new TreeMap<Integer, RegexCondition>();
+		Map<Integer, RegexCondition> temp = new TreeMap<Integer, RegexCondition>();
 		// key value on object and array
 		for (int index = 0; index < TraceLogConstants.REGEX_LIST.length; index++) {
 			// add to object
@@ -59,7 +59,7 @@ public class ConsoleLogImpl implements ConsoleLog {
 	 * @param prefixMap
 	 * @param argurment
 	 */
-	private <E> void checkMapPrefixAndObjectType(Map<Integer, KeyPairValue> prefixListOrder, E[]... arguments)
+	private <E> void checkMapPrefixAndObjectType(Map<Integer, RegexCondition> prefixListOrder, E[]... arguments)
 			throws NullPointerException, NoSuchObjectException {
 
 		if (arguments == null) {
@@ -71,18 +71,16 @@ public class ConsoleLogImpl implements ConsoleLog {
 		}
 
 		int position = 0;
-		for (Map.Entry<Integer, KeyPairValue> entry : prefixListOrder.entrySet()) {
+		for (Map.Entry<Integer, RegexCondition> entry : prefixListOrder.entrySet()) {
 			for (int index = 0; index < TraceLogConstants.REGEX_LIST.length; index++) {
-				if (TraceLogConstants.REGEX_LIST[index].equals(entry.getValue().getKey())) {
+				if (TraceLogConstants.REGEX_LIST[index].equals(entry.getValue().getSignalPrefix())) {
 					if (!TraceLogUtils.checkObjectType(TraceLogConstants.REGEX_TYPE[index], arguments[position][0])) {
 						throw new NoSuchObjectException(
 								"Prefix " + TraceLogConstants.REGEX_PREFIX + TraceLogConstants.REGEX_LIST[index]
 										+ " Not Match For Type " + arguments[position][0].getClass());
 					}
-					if ((entry.getValue().getValue().equals(TraceLogConstants.REGEX_TYPE_ARRAY)
-							&& arguments[position].length < 1)
-							|| (entry.getValue().getValue().equals(TraceLogConstants.REGEX_TYPE_OBJECT)
-									&& arguments[position].length != 1)) {
+					if ((entry.getValue().isArray() && arguments[position].length < 1)
+							|| (!entry.getValue().isArray() && arguments[position].length != 1)) {
 						throw new NoSuchObjectException("Prefix and Argument Is Not Incorrect.");
 					}
 					position++;
@@ -96,7 +94,7 @@ public class ConsoleLogImpl implements ConsoleLog {
 	 * @param prefixMap
 	 * @param argurment
 	 */
-	private <E> void checkMapPrefixAndObjectType(Map<Integer, KeyPairValue> prefixListOrder, E... argument)
+	private <E> void checkMapPrefixAndObjectType(Map<Integer, RegexCondition> prefixListOrder, E... argument)
 			throws NullPointerException, NoSuchObjectException {
 
 		if (argument == null) {
@@ -108,9 +106,9 @@ public class ConsoleLogImpl implements ConsoleLog {
 		}
 
 		int position = 0;
-		for (Map.Entry<Integer, KeyPairValue> entry : prefixListOrder.entrySet()) {
+		for (Map.Entry<Integer, RegexCondition> entry : prefixListOrder.entrySet()) {
 			for (int index = 0; index < TraceLogConstants.REGEX_LIST.length; index++) {
-				if (TraceLogConstants.REGEX_LIST[index].equals(entry.getValue().getKey())) {
+				if (TraceLogConstants.REGEX_LIST[index].equals(entry.getValue().getSignalPrefix())) {
 					if (!TraceLogUtils.checkObjectType(TraceLogConstants.REGEX_TYPE[index], argument[position])) {
 						throw new NoSuchObjectException(
 								"Prefix " + TraceLogConstants.REGEX_PREFIX + TraceLogConstants.REGEX_LIST[index]
@@ -131,7 +129,7 @@ public class ConsoleLogImpl implements ConsoleLog {
 	private <E> String formatToConsoleLog(String string, E[]... arguments) {
 		String res = new String(string);
 
-		Map<Integer, KeyPairValue> prefixListOrder = getPrefixListOnString(string);
+		Map<Integer, RegexCondition> prefixListOrder = getPrefixListOnString(string);
 		try {
 
 			checkMapPrefixAndObjectType(prefixListOrder, arguments);
@@ -140,13 +138,14 @@ public class ConsoleLogImpl implements ConsoleLog {
 			String[] values;
 			String stringWillReplace;
 
-			for (Map.Entry<Integer, KeyPairValue> entry : prefixListOrder.entrySet()) {
+			for (Map.Entry<Integer, RegexCondition> entry : prefixListOrder.entrySet()) {
 				for (int index = 0; index < TraceLogConstants.REGEX_LIST.length; index++) {
-					if (TraceLogConstants.REGEX_LIST[index].equals(entry.getValue().getKey())) {
-						values = TraceLogUtils.convertElementArrayTypeToString(arguments[position++]);
+
+					if (TraceLogConstants.REGEX_LIST[index].equals(entry.getValue().getSignalPrefix())) {
+						values = TraceLogUtils.convertElementArrayTypeToString(arguments[position++], entry.getValue());
 						// object is single
 						String regex = "";
-						if (entry.getValue().getValue().equals(TraceLogConstants.REGEX_TYPE_OBJECT)) {
+						if (!entry.getValue().isArray()) {
 							stringWillReplace = TraceLogUtils.putValueOnSingle(TraceLogConstants.REGEX_TYPE[index],
 									values);
 							regex = TraceLogConstants.REGEX_PREFIX.concat(TraceLogConstants.REGEX_LIST[index]);
@@ -158,7 +157,6 @@ public class ConsoleLogImpl implements ConsoleLog {
 											+ TraceLogConstants.REGEX_LIST[index] + "\\"
 											+ TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES);
 						}
-						// System.out.println(stringWillReplace);
 						// replace string
 						res = res.replaceFirst(regex, stringWillReplace);
 					}
@@ -188,7 +186,7 @@ public class ConsoleLogImpl implements ConsoleLog {
 	private <E> String formatToConsoleLog(String string, E... argument) {
 		String res = new String(string);
 
-		Map<Integer, KeyPairValue> prefixListOrder = getPrefixListOnString(string);
+		Map<Integer, RegexCondition> prefixListOrder = getPrefixListOnString(string);
 		try {
 
 			checkMapPrefixAndObjectType(prefixListOrder, argument);
@@ -197,15 +195,15 @@ public class ConsoleLogImpl implements ConsoleLog {
 			String[] values;
 			String stringWillReplace;
 
-			for (Map.Entry<Integer, KeyPairValue> entry : prefixListOrder.entrySet()) {
+			for (Map.Entry<Integer, RegexCondition> entry : prefixListOrder.entrySet()) {
 
 				for (int index = 0; index < TraceLogConstants.REGEX_LIST.length; index++) {
-					if (TraceLogConstants.REGEX_LIST[index].equals(entry.getValue().getKey())) {
+					if (TraceLogConstants.REGEX_LIST[index].equals(entry.getValue().getSignalPrefix())) {
 
-						values = TraceLogUtils.convertElementTypeToString(argument[position++]);
+						values = TraceLogUtils.convertElementTypeToString(argument[position++], entry.getValue());
 						// object is single
 						String regex = "";
-						if (entry.getValue().getValue().equals(TraceLogConstants.REGEX_TYPE_OBJECT)) {
+						if (!entry.getValue().isArray()) {
 							stringWillReplace = TraceLogUtils.putValueOnSingle(TraceLogConstants.REGEX_TYPE[index],
 									values);
 							regex = TraceLogConstants.REGEX_PREFIX.concat(TraceLogConstants.REGEX_LIST[index]);
@@ -217,6 +215,7 @@ public class ConsoleLogImpl implements ConsoleLog {
 											+ TraceLogConstants.REGEX_LIST[index] + "\\"
 											+ TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES);
 						}
+						
 						// replace string
 						res = res.replaceFirst(regex, stringWillReplace);
 					}
@@ -301,6 +300,7 @@ public class ConsoleLogImpl implements ConsoleLog {
 
 	@Override
 	public <E> void logInfo(String infor, E... arg) {
+
 		String rewrite = getLogInfor(infor, arg);
 		System.err.println(TraceLogConstants.ANSI_WHITE_BACKGROUND + TraceLogConstants.ANSI_BLUE + rewrite + " "
 				+ TraceLogConstants.ANSI_RESET);
@@ -325,6 +325,7 @@ public class ConsoleLogImpl implements ConsoleLog {
 
 	@Override
 	public <E> String getLogInfor(String infor, E... argument) {
+
 		StringBuilder rewrite = new StringBuilder(
 				" [ " + TraceLogUtils.StringformatDate(TraceLogUtils.FORMAT_DATE_HHMMSS)
 						+ " INFOR ] ".concat(this.formatToConsoleLog(infor, argument)));

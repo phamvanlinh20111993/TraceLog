@@ -2,7 +2,6 @@ package tracelog.phamlinh.example.main;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,7 @@ public class Main {
 
 		ConsoleLogImpl console = new ConsoleLogImpl();
 
-		console.logError("Can not find value for arguments: %%va. and %%ag and %%ag --- and %%ag",
+	/*	console.logError("Can not find value for arguments: %%va. and %%ag and %%ag --- and %%ag",
 				new String[] { "name"}, 
 				new String[] { "qt3" },
 				new String[] { "n23r23ame"},
@@ -58,12 +57,14 @@ public class Main {
 		console.logWarning("Show list object number: %%{n} = %%n ", 
 				new Float[] { -400.9999f, 121200.9999f, 
 						100.9132999f, -3121100.9999f	
-		}, new Integer(30));
+		}, new Integer(30)); */
 		
-		console.logInfo("%%n <> %%n", 0423423.5f, 4654645);
 		
-		console.logInfo("%%ob <> %%ob",  new KeyPairValue("karteId", "customerName"), 
-				new KeyPairValue("karteId1", "customerName1"));
+		
+		console.logInfo("%%n5.5f <> %%n", 0423423.5f, 4654645);
+		
+	//	console.logInfo("%%ob <> %%ob",  new KeyPairValue("karteId", "customerName"), 
+	//			new KeyPairValue("karteId1", "customerName1"));
 		
 				
 		// https://www.codingunit.com/printf-format-specifiers-format-conversions-and-formatted-output
@@ -71,7 +72,7 @@ public class Main {
 		
 		Map<String, String> abc = new HashMap<>();
 		abc.put("fas", "gdfdgdf");
-		System.out.println("check " + TraceLogUtils.isJavaUtilObject(test));
+	//	System.out.println("check " + TraceLogUtils.isJavaUtilObject(test));
 		
 //		Double numb = 1222222222222222222222222222223333333333331.433333333333333d;
 //		System.out.println("number is " + numb);
@@ -79,11 +80,11 @@ public class Main {
 //		System.out.println("After format " + format);
 		
 		
-		Double numb = 122222.43333344444444444444433333d;
-		System.out.println("number is " + numb);
-		DecimalFormat df = new DecimalFormat("###################################.###############################################");
-		String format = df.format(numb);
-		System.out.println("After format " + format);
+//		Double numb = 122222.43333344444444444444433333d;
+//		System.out.println("number is " + numb);
+//		DecimalFormat df = new DecimalFormat("###################################.###############################################");
+//		String format = df.format(numb);
+//		System.out.println("After format " + format);
 		
 		Number s = new Float(300.23423);
 		System.out.println(s.toString());

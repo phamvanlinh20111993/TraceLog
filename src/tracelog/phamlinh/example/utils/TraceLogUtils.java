@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 import javax.activation.UnsupportedDataTypeException;
 
-import tracelog.phamlinh.example.object.KeyPairValue;
+import tracelog.phamlinh.example.object.RegexCondition;
 import tracelog.phamlinh.example.object.TransferMapToObject;
 
 public class TraceLogUtils {
@@ -109,9 +109,10 @@ public class TraceLogUtils {
 	public static String addPrefixNumber(Number number, Integer previouDecimalPoint, Integer afterDecimalPoint)
 			throws UnsupportedDataTypeException, NullPointerException {
 		String res = "";
+		
 		if ((number instanceof Integer || number instanceof Long || number instanceof Short || number instanceof Byte)
 				&& (previouDecimalPoint > 0 || afterDecimalPoint > 0)) {
-			throw new UnsupportedDataTypeException("Unsupported for type Integer, Long, Short, Byte. ");
+			throw new UnsupportedDataTypeException("Unsupported for type " + number.getClass().getTypeName());
 		} else if (!(number instanceof Integer || number instanceof Long || number instanceof Short)
 				&& (previouDecimalPoint > 0 || afterDecimalPoint > 0)) {
 
@@ -163,9 +164,9 @@ public class TraceLogUtils {
 	 * @param key
 	 * @return
 	 */
-	public static Map<Integer, KeyPairValue> getPrefixOnString(String string, String key) {
+	public static Map<Integer, RegexCondition> getPrefixOnString(String string, String key) {
 
-		Map<Integer, KeyPairValue> getOrderPrefix = new TreeMap<Integer, KeyPairValue>();
+		Map<Integer, RegexCondition> getOrderPrefix = new TreeMap<Integer, RegexCondition>();
 		Boolean isArray = key.charAt(0) == TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES.charAt(0)
 				&& key.charAt(key.length() - 1) == TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES.charAt(0);
 		String prefixKey = key;
@@ -175,11 +176,16 @@ public class TraceLogUtils {
 			prefixKey = "\\" + key.substring(0, length - 1) + "\\" + key.substring(length - 1, length);
 			key = key.substring(1, length - 1);
 		}
+
 		Pattern p = Pattern.compile(TraceLogConstants.REGEX_PREFIX.concat(prefixKey));
+		String naturePath = "0", decimalPath = "0";
 		Matcher m = p.matcher(string);
 		while (m.find()) {
-			getOrderPrefix.put(m.start(), new KeyPairValue(key,
-					isArray ? TraceLogConstants.REGEX_TYPE_ARRAY : TraceLogConstants.REGEX_TYPE_OBJECT));
+			if (m.groupCount() > 0) {
+				naturePath = m.group(1) != null ? m.group(1).toString() : naturePath;
+				decimalPath = m.group(2) != null ? m.group(2).toString() : decimalPath;
+		   }
+			getOrderPrefix.put(m.start(), new RegexCondition(m.group(), isArray, "", key, "", naturePath, decimalPath));
 		}
 
 		return getOrderPrefix;
@@ -193,8 +199,9 @@ public class TraceLogUtils {
 	 * @throws IllegalAccessException
 	 * @throws NoSuchFieldException
 	 */
-	public static <E> String[] convertElementArrayTypeToString(E[] arguments)
-			throws UnsupportedDataTypeException, NullPointerException, NoSuchFieldException, IllegalAccessException {
+	public static <E> String[] convertElementArrayTypeToString(E[] arguments, RegexCondition condition)
+			throws UnsupportedDataTypeException, NullPointerException, NoSuchFieldException, IllegalAccessException,
+			NumberFormatException {
 
 		ArrayList<String> response = new ArrayList<>();
 
@@ -208,7 +215,8 @@ public class TraceLogUtils {
 				response.add(convertObjectToString(argument));
 			} else {
 				if (argument instanceof Number) {
-					response.add(TraceLogUtils.addPrefixNumber((Number) argument, 0, 0));
+					response.add(TraceLogUtils.addPrefixNumber((Number) argument,
+							Integer.valueOf(condition.getNaturePath()), Integer.valueOf(condition.getDecimal())));
 				} else if (argument instanceof String) {
 					response.add((String) argument);
 				} else if (argument instanceof Character) {
@@ -233,7 +241,7 @@ public class TraceLogUtils {
 	 * @throws IllegalAccessException
 	 * @throws NoSuchFieldException
 	 */
-	public static <E> String[] convertElementTypeToString(E argument)
+	public static <E> String[] convertElementTypeToString(E argument, RegexCondition condition)
 			throws UnsupportedDataTypeException, NullPointerException, NoSuchFieldException, IllegalAccessException {
 
 		ArrayList<String> response = new ArrayList<>();
@@ -244,7 +252,8 @@ public class TraceLogUtils {
 			response.add(convertObjectToString(argument));
 		} else {
 			if (argument instanceof Number) {
-				response.add(TraceLogUtils.addPrefixNumber((Number) argument, 0, 0));
+				response.add(TraceLogUtils.addPrefixNumber((Number) argument,
+						Integer.valueOf(condition.getNaturePath()), Integer.valueOf(condition.getDecimal())));
 			} else if (argument instanceof String) {
 				response.add((String) argument);
 			} else if (argument instanceof Character) {
@@ -348,28 +357,33 @@ public class TraceLogUtils {
 	 */
 	public static String putValueOnSingle(String key, String[] value) {
 		StringBuilder res = new StringBuilder("");
-
 		switch (key) {
 		case TraceLogConstants.REGEX_TYPE_VALUE:
-			res = res.append(TraceLogUtils.joinString(value, "😈\\(", "\\)😈"));
+			res = res.append(TraceLogUtils.joinString(value, "\\(", "\\)"));
 			break;
 		case TraceLogConstants.REGEX_TYPE_ARGUMENT:
-			res = res.append(TraceLogUtils.joinString(value, "😊\\{", "\\}😊"));
+			res = res.append(TraceLogUtils.joinString(value, "\\{", "\\}"));
 			break;
 		case TraceLogConstants.REGEX_TYPE_NUMBER:
-			res = res.append(TraceLogUtils.joinString(value, "😎\\$\\{", "\\}😎"));
+			res = res.append(TraceLogUtils.joinString(value, "\\$\\{", "\\}"));
+			break;
+		case TraceLogConstants.REGEX_TYPE_FLOAT_NUMBER:
+			res = res.append(TraceLogUtils.joinString(value, "\\$\\{", "\\}"));
+			break;
+		case TraceLogConstants.REGEX_TYPE_DOUBLE_NUMBER:
+			res = res.append(TraceLogUtils.joinString(value, "\\$\\{", "\\}"));
 			break;
 		case TraceLogConstants.REGEX_TYPE_STRING:
-			res = res.append(TraceLogUtils.joinString(value, "😉\"", "\"😉"));
+			res = res.append(TraceLogUtils.joinString(value, "\"", "\""));
 			break;
 		case TraceLogConstants.REGEX_TYPE_CHAR:
-			res = res.append(TraceLogUtils.joinString(value, "😵'", "'😵"));
+			res = res.append(TraceLogUtils.joinString(value, "'", "'"));
 			break;
 		case TraceLogConstants.REGEX_TYPE_OBJECT:
-			res = res.append(TraceLogUtils.joinString(value, "😈\\@\\{", "\\}😈"));
+			res = res.append(TraceLogUtils.joinString(value, "\\@\\{", "\\}"));
 			break;
 		case TraceLogConstants.REGEX_TYPE_BOOLEAN:
-			res = res.append(TraceLogUtils.joinString(value, "😄<<", ">>😄"));
+			res = res.append(TraceLogUtils.joinString(value, "<<", ">>"));
 			break;
 		default:
 			break;
