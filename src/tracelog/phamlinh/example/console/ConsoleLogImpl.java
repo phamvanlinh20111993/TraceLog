@@ -32,7 +32,6 @@ public class ConsoleLogImpl implements ConsoleLog {
 	 * @return
 	 */
 	private Map<Integer, RegexCondition> getPrefixListOnString(String string) {
-
 		Map<Integer, RegexCondition> getPosition = new TreeMap<Integer, RegexCondition>();
 		Map<Integer, RegexCondition> temp = new TreeMap<Integer, RegexCondition>();
 		// key value on object and array
@@ -196,10 +195,9 @@ public class ConsoleLogImpl implements ConsoleLog {
 			String stringWillReplace;
 
 			for (Map.Entry<Integer, RegexCondition> entry : prefixListOrder.entrySet()) {
-
+				
 				for (int index = 0; index < TraceLogConstants.REGEX_LIST.length; index++) {
 					if (TraceLogConstants.REGEX_LIST[index].equals(entry.getValue().getSignalPrefix())) {
-
 						values = TraceLogUtils.convertElementTypeToString(argument[position++], entry.getValue());
 						// object is single
 						String regex = "";
