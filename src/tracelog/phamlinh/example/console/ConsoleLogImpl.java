@@ -108,10 +108,11 @@ public class ConsoleLogImpl implements ConsoleLog {
 		for (Map.Entry<Integer, RegexCondition> entry : prefixListOrder.entrySet()) {
 			for (int index = 0; index < TraceLogConstants.REGEX_LIST.length; index++) {
 				if (TraceLogConstants.REGEX_LIST[index].equals(entry.getValue().getSignalPrefix())) {
+				//	System.out.println(TraceLogConstants.REGEX_TYPE[index] + " -- " + argument[position].getClass().getTypeName());
 					if (!TraceLogUtils.checkObjectType(TraceLogConstants.REGEX_TYPE[index], argument[position])) {
 						throw new NoSuchObjectException(
-								"Prefix " + TraceLogConstants.REGEX_PREFIX + TraceLogConstants.REGEX_LIST[index]
-										+ " Not Match For Type " + argument[position].getClass());
+								"Prefix " + entry.getValue().getRegex()
+										+ " Not Match For Type " + argument[position].getClass().getTypeName());
 					}
 					position++;
 				}
