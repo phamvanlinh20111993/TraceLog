@@ -31,6 +31,17 @@ public class TraceLogUtils {
 	public static final Integer MAX_PREVIOUS_DECIMAL_POINT = 100;
 	public static final Integer MAX_AFTER_DECIMAL_POINT = 100;
 
+	public static final String PRIMITIVE_TYPE_INTEGER = "int";
+	public static final String PRIMITIVE_TYPE_CHAR = "char";
+	public static final String PRIMITIVE_TYPE_BYTE = "byte";
+	public static final String PRIMITIVE_TYPE_LONG = "long";
+	public static final String PRIMITIVE_TYPE_FLOAT = "float";
+	public static final String PRIMITIVE_TYPE_DOUBLE = "double";
+	public static final String PRIMITIVE_TYPE_ARRAY = "[]";
+
+	public static final String[] LIST_PRIMITIVE_TYPE = { PRIMITIVE_TYPE_INTEGER, PRIMITIVE_TYPE_CHAR,
+			PRIMITIVE_TYPE_BYTE, PRIMITIVE_TYPE_LONG, PRIMITIVE_TYPE_FLOAT, PRIMITIVE_TYPE_DOUBLE };
+
 	/**
 	 * 
 	 * @param check
@@ -40,7 +51,24 @@ public class TraceLogUtils {
 		return check.getClass().getName().startsWith("java.lang")
 				|| check.getClass().getName().startsWith("[Ljava.lang");
 	}
+	
+	/**
+	 * 
+	 * @param check
+	 * @return
+	 */
+	public static <E> boolean isJavaPrimitive(E check) {
+		String typeCheck = check.getClass().getTypeName();
 
+		for (String type : LIST_PRIMITIVE_TYPE) {
+			if (typeCheck.equals(type) || typeCheck.equals(type.concat(PRIMITIVE_TYPE_ARRAY))) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
 	/**
 	 * 
 	 * @param check

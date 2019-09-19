@@ -58,10 +58,10 @@ public class Main {
 		}, new Integer(30)); 
 		
 		
-		console.logInfo("%%n0.28f <> %%n + %%n and %%bl", 0423423.554353454535345f, 4654645, 3243, true);
+		console.logInfo("%%n0.28f <> %%n + %%n and %%{n}", 0423423.554353454535345f, 4654645, 3243, new short[] {1, 1});
 		
-		console.logInfo("%%ob <> %%ob and %%bl",  new KeyPairValue("karteId", "customerName"), 
-				new KeyPairValue("karteId1", "customerName1"), true);
+//		console.logInfo("%%ob <> %%ob and %%bl",  new KeyPairValue("karteId", "customerName"), 
+//				new KeyPairValue("karteId1", "customerName1"), true);
 		
 				
 		// https://www.codingunit.com/printf-format-specifiers-format-conversions-and-formatted-output
