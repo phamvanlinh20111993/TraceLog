@@ -36,11 +36,14 @@ public class TraceLogUtils {
 	public static final String PRIMITIVE_TYPE_BYTE = "byte";
 	public static final String PRIMITIVE_TYPE_LONG = "long";
 	public static final String PRIMITIVE_TYPE_FLOAT = "float";
+	public static final String PRIMITIVE_TYPE_SHORT = "short";
 	public static final String PRIMITIVE_TYPE_DOUBLE = "double";
+	public static final String PRIMITIVE_TYPE_BOOLEAN = "boolean";
 	public static final String PRIMITIVE_TYPE_ARRAY = "[]";
 
 	public static final String[] LIST_PRIMITIVE_TYPE = { PRIMITIVE_TYPE_INTEGER, PRIMITIVE_TYPE_CHAR,
-			PRIMITIVE_TYPE_BYTE, PRIMITIVE_TYPE_LONG, PRIMITIVE_TYPE_FLOAT, PRIMITIVE_TYPE_DOUBLE };
+			PRIMITIVE_TYPE_BYTE, PRIMITIVE_TYPE_LONG, PRIMITIVE_TYPE_FLOAT, PRIMITIVE_TYPE_DOUBLE, PRIMITIVE_TYPE_SHORT,
+			PRIMITIVE_TYPE_BOOLEAN };
 
 	/**
 	 * 
@@ -48,10 +51,10 @@ public class TraceLogUtils {
 	 * @return
 	 */
 	public static boolean isJavaLangObject(Object check) {
-		return check.getClass().getName().startsWith("java.lang")
+		return isJavaPrimitive(check) || check.getClass().getName().startsWith("java.lang")
 				|| check.getClass().getName().startsWith("[Ljava.lang");
 	}
-	
+
 	/**
 	 * 
 	 * @param check
@@ -59,7 +62,6 @@ public class TraceLogUtils {
 	 */
 	public static <E> boolean isJavaPrimitive(E check) {
 		String typeCheck = check.getClass().getTypeName();
-
 		for (String type : LIST_PRIMITIVE_TYPE) {
 			if (typeCheck.equals(type) || typeCheck.equals(type.concat(PRIMITIVE_TYPE_ARRAY))) {
 				return true;
@@ -68,7 +70,130 @@ public class TraceLogUtils {
 
 		return false;
 	}
-	
+
+	/**
+	 * 
+	 * @param argument
+	 * @return
+	 */
+	public static <E> List<String> convertPrimitiveTypeToString(E argument) {
+		List<String> response = new ArrayList<String>();
+		String typeCheck = argument.getClass().getTypeName();
+
+		if (typeCheck.equals(PRIMITIVE_TYPE_SHORT)) {
+			short sho = (short) argument;
+			response.add(Short.toString(sho));
+		} else if (typeCheck.equals(PRIMITIVE_TYPE_SHORT.concat(PRIMITIVE_TYPE_ARRAY))) {
+			short[] shoL = (short[]) argument;
+			for (short sho : shoL)
+				response.add(Short.toString(sho));
+		} else if (typeCheck.equals(PRIMITIVE_TYPE_INTEGER)) {
+			int in = (int) argument;
+			response.add(Integer.toString(in));
+		} else if (typeCheck.equals(PRIMITIVE_TYPE_INTEGER.concat(PRIMITIVE_TYPE_ARRAY))) {
+			int[] inL = (int[]) argument;
+			for (int in : inL)
+				response.add(Integer.toString(in));
+		} else if (typeCheck.equals(PRIMITIVE_TYPE_CHAR)) {
+			char ch = (char) argument;
+			response.add(Character.toString(ch));
+		} else if (typeCheck.equals(PRIMITIVE_TYPE_CHAR.concat(PRIMITIVE_TYPE_ARRAY))) {
+			char[] chL = (char[]) argument;
+			for (char ch : chL)
+				response.add(Character.toString(ch));
+		} else if (typeCheck.equals(PRIMITIVE_TYPE_DOUBLE)) {
+			double dou = (double) argument;
+			response.add(Double.toString(dou));
+		} else if (typeCheck.equals(PRIMITIVE_TYPE_DOUBLE.concat(PRIMITIVE_TYPE_ARRAY))) {
+			double[] douL = (double[]) argument;
+			for (double dou : douL)
+				response.add(Double.toString(dou));
+		} else if (typeCheck.equals(PRIMITIVE_TYPE_FLOAT)) {
+			float flo = (float) argument;
+			response.add(Float.toString(flo));
+		} else if (typeCheck.equals(PRIMITIVE_TYPE_FLOAT.concat(PRIMITIVE_TYPE_ARRAY))) {
+			float[] folL = (float[]) argument;
+			for (float fol : folL)
+				response.add(Float.toString(fol));
+		} else if (typeCheck.equals(PRIMITIVE_TYPE_LONG)) {
+			long lo = (long) argument;
+			response.add(Long.toString(lo));
+		} else if (typeCheck.equals(PRIMITIVE_TYPE_LONG.concat(PRIMITIVE_TYPE_ARRAY))) {
+			long[] loL = (long[]) argument;
+			for (long lo : loL)
+				response.add(Long.toString(lo));
+		} else if (typeCheck.equals(PRIMITIVE_TYPE_BYTE)) {
+			byte byt = (byte) argument;
+			response.add(Byte.toString(byt));
+		} else if (typeCheck.equals(PRIMITIVE_TYPE_BYTE.concat(PRIMITIVE_TYPE_ARRAY))) {
+			byte[] bytL = (byte[]) argument;
+			for (byte byt : bytL)
+				response.add(Float.toString(byt));
+		} else if (typeCheck.equals(PRIMITIVE_TYPE_BOOLEAN)) {
+			boolean bool = (boolean) argument;
+			response.add(Boolean.toString(bool));
+		} else if (typeCheck.equals(PRIMITIVE_TYPE_BOOLEAN.concat(PRIMITIVE_TYPE_ARRAY))) {
+			boolean[] boolL = (boolean[]) argument;
+			for (boolean bool : boolL)
+				response.add(Boolean.toString(bool));
+		}
+
+		return response;
+	}
+
+	/**
+	 * 
+	 * @param argument
+	 * @return
+	 * @throws NullPointerException
+	 * @throws UnsupportedDataTypeException
+	 * @throws NumberFormatException
+	 */
+	public static <E> List<String> convertWrapperTypeToString(E argument, RegexCondition condition)
+			throws NumberFormatException, UnsupportedDataTypeException, NullPointerException {
+		List<String> response = new ArrayList<String>();
+
+		if (argument instanceof Number) {
+			response.add(TraceLogUtils.addPrefixNumber((Number) argument, Integer.valueOf(condition.getNaturePath()),
+					Integer.valueOf(condition.getDecimal())));
+		} else if (argument instanceof Number[]) {
+			Number[] inL = (Number[]) argument;
+			for (Number in : inL)
+				response.add(TraceLogUtils.addPrefixNumber(in, Integer.valueOf(condition.getNaturePath()),
+						Integer.valueOf(condition.getDecimal())));
+		} else if (argument instanceof Character) {
+			Character ch = (Character) argument;
+			response.add(Character.toString(ch));
+		} else if (argument instanceof Character[]) {
+			Character[] chL = (Character[]) argument;
+			for (Character ch : chL)
+				response.add(Character.toString(ch));
+		} else if (argument instanceof Byte) {
+			Byte byt = (Byte) argument;
+			response.add(Byte.toString(byt));
+		} else if (argument instanceof Byte[]) {
+			Byte[] bytL = (Byte[]) argument;
+			for (Byte byt : bytL)
+				response.add(Float.toString(byt));
+		} else if (argument instanceof Boolean) {
+			Boolean bool = (Boolean) argument;
+			response.add(Boolean.toString(bool));
+		} else if (argument instanceof Boolean[]) {
+			Boolean[] boolL = (Boolean[]) argument;
+			for (Boolean bool : boolL)
+				response.add(Boolean.toString(bool));
+		} else if (argument instanceof String) {
+			String string = (String) argument;
+			response.add(string);
+		} else if (argument instanceof String[]) {
+			String[] stringL = (String[]) argument;
+			for (String string : stringL)
+				response.add(string);
+		}
+
+		return response;
+	}
+
 	/**
 	 * 
 	 * @param check
@@ -229,48 +354,6 @@ public class TraceLogUtils {
 	 * @throws IllegalAccessException
 	 * @throws NoSuchFieldException
 	 */
-	public static <E> String[] convertElementArrayTypeToString(E[] arguments, RegexCondition condition)
-			throws UnsupportedDataTypeException, NullPointerException, NoSuchFieldException, IllegalAccessException,
-			NumberFormatException {
-
-		ArrayList<String> response = new ArrayList<>();
-
-		for (E argument : arguments) {
-			// object
-			if (argument == null) {
-				response.add("null");
-				continue;
-			}
-			if (!TraceLogUtils.isJavaLangObject(argument)) {
-				response.add(convertObjectToString(argument));
-			} else {
-				if (argument instanceof Number) {
-					response.add(TraceLogUtils.addPrefixNumber((Number) argument,
-							Integer.valueOf(condition.getNaturePath()), Integer.valueOf(condition.getDecimal())));
-				} else if (argument instanceof String) {
-					response.add((String) argument);
-				} else if (argument instanceof Character) {
-					response.add(Character.toString((Character) argument));
-				} else if (argument instanceof Boolean) {
-					response.add(Boolean.toString((Boolean) argument));
-				} else {
-					throw new UnsupportedDataTypeException(
-							"Unsupported this DataType: " + argument.getClass().getName().toLowerCase());
-				}
-			}
-		}
-
-		return response.toArray(new String[response.size()]);
-	}
-
-	/**
-	 * 
-	 * @param argument
-	 * @return
-	 * @throws UnsupportedDataTypeException
-	 * @throws IllegalAccessException
-	 * @throws NoSuchFieldException
-	 */
 	public static <E> String[] convertElementTypeToString(E argument, RegexCondition condition)
 			throws UnsupportedDataTypeException, NullPointerException, NoSuchFieldException, IllegalAccessException {
 
@@ -279,20 +362,25 @@ public class TraceLogUtils {
 			response.add("null");
 		}
 		if (!TraceLogUtils.isJavaLangObject(argument)) {
-			response.add(convertObjectToString(argument));
-		} else {
-			if (argument instanceof Number) {
-				response.add(TraceLogUtils.addPrefixNumber((Number) argument,
-						Integer.valueOf(condition.getNaturePath()), Integer.valueOf(condition.getDecimal())));
-			} else if (argument instanceof String) {
-				response.add((String) argument);
-			} else if (argument instanceof Character) {
-				response.add(Character.toString((Character) argument));
-			} else if (argument instanceof Boolean) {
-				response.add(Boolean.toString((Boolean) argument));
+			if (argument.getClass().isArray()) {
+				Object[] objectList = (Object[]) argument;
+				for (Object object : objectList) {
+					if (object == null) {
+						response.add("null");
+					} else {
+						response.add(convertObjectToString(object));
+					}
+				}
 			} else {
-				throw new UnsupportedDataTypeException(
-						"Unsupported this DataType: " + argument.getClass().getName().toLowerCase());
+				response.add(convertObjectToString(argument));
+			}
+		} else {
+			if (isJavaPrimitive(argument)) {
+				response.addAll(convertPrimitiveTypeToString(argument));
+			} else if (TraceLogUtils.isJavaLangObject(argument)) {
+				response.addAll(convertWrapperTypeToString(argument, condition));
+			} else {
+				throw new UnsupportedDataTypeException("Unsupported this DataType: " + argument.getClass().getName());
 			}
 		}
 
@@ -315,7 +403,6 @@ public class TraceLogUtils {
 				res = res.append(open + value[index].concat(close).concat(", "));
 			}
 		}
-
 		return value[value.length - 1] == "null" ? res.append(value[value.length - 1]).toString()
 				: res.append(open + value[value.length - 1] + close).toString();
 	}
@@ -451,6 +538,7 @@ public class TraceLogUtils {
 	 */
 	public static <T> String convertObjectToString(T object) throws NoSuchFieldException, IllegalAccessException,
 			NullPointerException, UnsupportedDataTypeException, IllegalArgumentException {
+
 		StringBuilder res = new StringBuilder("");
 		Field[] fields = object.getClass().getDeclaredFields();
 		String key, value;
