@@ -16,7 +16,7 @@ public class Main {
 
 		ConsoleLogImpl console = new ConsoleLogImpl();
 
-		console.logError("Can not find value for arguments: %%va. and %%ag and %%ag --- and %%ag",
+		console.logInfo("Can not find value for arguments: %%va. and %%ag and %%ag --- and %%ag",
 				new String[] { "name"}, 
 				new String[] { "qt3" },
 				new String[] { "n23r23ame"},
@@ -32,14 +32,13 @@ public class Main {
 		
 		console.logInfo("Value not match for list argument: %%{s} <> %%{n}", 
 				new String[] { "age", "num"},
-				new Integer[] { 312321312, 13213123});
+				new Integer[] { 312321312, 13213123}); 
 	
-		
 		List<RegexCondition> test = new ArrayList<>();
 		test.add(new RegexCondition("aaa", true, "type", "signalPrefix", "format"));
 		HashMap<String, RegexCondition> valueTestMap = new HashMap<>();
 		valueTestMap.put("test for key", new RegexCondition("dddđ", true, "we", "ddrưerewdđ", "drweddđ"));
-		console.logWarning("Show list object: %%{ob} = %%{n}", new KeyPairValue[] {
+		console.logInfo("Show list object: %%{ob} = %%{n}", new KeyPairValue[] {
 				new KeyPairValue("karteId", "customerName"), new KeyPairValue("karteId1", "customerName1"), null,
 				new KeyPairValue("karteId2", "customerName2", null, new Integer[] { 1, 2, 3, 4 }),
 				new KeyPairValue("karteId3", "customerName3"),
@@ -52,20 +51,21 @@ public class Main {
 
 				new Integer[] { 10, 100 });
 		
-		console.logWarning("Show list object number: %%{n} = %%n ", 
+		console.logInfo("Show list object number: %%{n} = %%n ", 
 				new Float[] { -400.9999f, 121200.9999f, 
 						100.9132999f, -3121100.9999f	
-		}, new Integer(30)); 
+		}, new Integer(30));  
 		
 		
-		console.logInfo("%%n0.28f <> %%n + %%n and %%{n}", 0423423.554353454535345f, 4654645, 3243, new short[] {1, 1});
+		console.logInfo("%%n0.28f <> %%n + %%n and %%{n} = %%n", 0423423.554353454535345f, new Integer(32), 3243, 
+				new short[] {1, 1, 23}, 232);
 		
-//		console.logInfo("%%ob <> %%ob and %%bl",  new KeyPairValue("karteId", "customerName"), 
-//				new KeyPairValue("karteId1", "customerName1"), true);
+		console.logInfo("%%ob <> %%ob and %%bl",  new KeyPairValue("karteId", "customerName"), 
+				new KeyPairValue("karteId1", "customerName1"), true); 
 		
 				
 		// https://www.codingunit.com/printf-format-specifiers-format-conversions-and-formatted-output
-	//	console.logError("value = %%n", new Float[] {42423.32576567567563f});
+		console.logInfo("value = %%n", new Float[] {42423.32576567567563f});
 		
 //		Map<String, String> abc = new HashMap<>();
 //		abc.put("fas", "gdfdgdf");
