@@ -3,7 +3,10 @@ package tracelog.phamlinh.example.main;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collector;
 
 import tracelog.phamlinh.example.console.ConsoleLogImpl;
 import tracelog.phamlinh.example.object.KeyPairValue;
@@ -16,7 +19,7 @@ public class Main {
 
 		ConsoleLogImpl console = new ConsoleLogImpl();
 
-		console.logInfo("Can not find value for arguments: %%va. and %%ag and %%ag --- and %%ag",
+		console.logError("Can not find value for arguments: %%va. and %%ag and %%ag --- and %%ag",
 				new String[] { "name"}, 
 				new String[] { "qt3" },
 				new String[] { "n23r23ame"},
@@ -38,7 +41,7 @@ public class Main {
 		test.add(new RegexCondition("aaa", true, "type", "signalPrefix", "format"));
 		HashMap<String, RegexCondition> valueTestMap = new HashMap<>();
 		valueTestMap.put("test for key", new RegexCondition("dddđ", true, "we", "ddrưerewdđ", "drweddđ"));
-		console.logInfo("Show list object: %%{ob} = %%{n}", new KeyPairValue[] {
+		console.logWarning("Show list object: %%{ob} = %%{n}", new KeyPairValue[] {
 				new KeyPairValue("karteId", "customerName"), new KeyPairValue("karteId1", "customerName1"), null,
 				new KeyPairValue("karteId2", "customerName2", null, new Integer[] { 1, 2, 3, 4 }),
 				new KeyPairValue("karteId3", "customerName3"),
@@ -57,8 +60,8 @@ public class Main {
 		}, new Integer(30));  
 		
 		
-		console.logInfo("%%n0.28f <> %%n + %%n and %%{n} = %%n", 0423423.554353454535345f, new Integer(32), 3243, 
-				new short[] {1, 1, 23}, 232);
+		console.logError("%%n0.28f <> %%n + %%n and %%{n} = %%{n}", 0423423.554353454535345f, new Integer(32), 3243, 
+				new short[] {1, 1, 23}, new short[] {1, 1, 23});
 		
 		console.logInfo("%%ob <> %%ob and %%bl",  new KeyPairValue("karteId", "customerName"), 
 				new KeyPairValue("karteId1", "customerName1"), true); 
@@ -66,6 +69,19 @@ public class Main {
 				
 		// https://www.codingunit.com/printf-format-specifiers-format-conversions-and-formatted-output
 		console.logInfo("value = %%n", new Float[] {42423.32576567567563f});
+		
+		List<Long> testA = new ArrayList<>();
+		testA.add(1L);
+		testA.add(2L);
+		testA.add(3L);
+		
+		Map<String, Integer> testB = new LinkedHashMap<String, Integer>();
+		testB.put("222", 32);
+		testB.put("444", 132);
+		testB.put("233", 2);
+		
+		console.logWarning("Show list object number collection: %%{n} = %%n and  %%{n}", 
+				testA, new Integer(30), testB);  
 		
 //		Map<String, String> abc = new HashMap<>();
 //		abc.put("fas", "gdfdgdf");
