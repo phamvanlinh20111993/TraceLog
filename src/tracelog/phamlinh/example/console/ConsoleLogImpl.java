@@ -13,13 +13,13 @@ import tracelog.phamlinh.example.utils.TraceLogUtils;
 public class ConsoleLogImpl implements ConsoleLog {
 
 	public ConsoleLogImpl() {
-		System.err.println(TraceLogUtils.StringformatDate(TraceLogUtils.FORMAT_DATE_YYYYMMDDHHMMSSA) + " "
+		System.err.println(TraceLogUtils.StringUtils.StringformatDate(TraceLogUtils.FORMAT_DATE_YYYYMMDDHHMMSSA) + " "
 				+ System.getProperty("user.dir"));
 		System.err.println("\t\t\t## Start trace log. ##\t\t\t");
 	}
 
 	public ConsoleLogImpl(String content) {
-		System.err.println(TraceLogUtils.StringformatDate(TraceLogUtils.FORMAT_DATE_YYYYMMDDHHMMSSA) + " "
+		System.err.println(TraceLogUtils.StringUtils.StringformatDate(TraceLogUtils.FORMAT_DATE_YYYYMMDDHHMMSSA) + " "
 				+ System.getProperty("user.dir"));
 		System.err.println("\t\t\t## Start trace log. ##\t\t\t");
 		System.err.println("\t\t\t## " + content);
@@ -55,51 +55,6 @@ public class ConsoleLogImpl implements ConsoleLog {
 
 	/**
 	 * 
-	 * @param prefixMap
-	 * @param argurment
-	 */
-	private <E> void checkMapPrefixAndObjectType(Map<Integer, RegexCondition> prefixListOrder, E... argument)
-			throws NullPointerException, NoSuchObjectException {
-
-		if (argument == null) {
-			throw new NoSuchObjectException("Argument can not be null.");
-		}
-
-		if (prefixListOrder.size() != argument.length) {
-			throw new NoSuchObjectException("Prefix and Argument Are Not The Same Length.");
-		}
-
-		int position = 0;
-		for (Map.Entry<Integer, RegexCondition> entry : prefixListOrder.entrySet()) {
-			for (int index = 0; index < TraceLogConstants.REGEX_LIST.length; index++) {
-				if (TraceLogConstants.REGEX_LIST[index].equals(entry.getValue().getSignalPrefix())) {
-					if (argument[position].getClass().isArray()) {
-						// if(argument[position].getClass().getComponentType().isPrimitive()) {
-						// short[] t = (short[]) argument[position];
-						// for(int i = 0; i < t.length; i++) {
-						// System.out.println(t[i]);
-						// }
-						// }else {
-						// Short[] t = (Short[]) argument[position];
-						// for(int i = 0; i < t.length; i++) {
-						// System.out.println(t[i]);
-						// }
-						// }
-					}
-					// if (!TraceLogUtils.checkObjectType(TraceLogConstants.REGEX_TYPE[index],
-					// argument[position])) {
-					// throw new NoSuchObjectException(
-					// "Prefix " + entry.getValue().getRegex()
-					// + " Not Match For Type " + argument[position].getClass().getTypeName());
-					// }
-					position++;
-				}
-			}
-		}
-	}
-
-	/**
-	 * 
 	 * @param string
 	 * @param argument
 	 * @return
@@ -110,7 +65,12 @@ public class ConsoleLogImpl implements ConsoleLog {
 		Map<Integer, RegexCondition> prefixListOrder = getPrefixListOnString(string);
 		try {
 
-			checkMapPrefixAndObjectType(prefixListOrder, argument);
+			if (argument == null) {
+				throw new NoSuchObjectException("Argument can not be null.");
+			}
+			if (prefixListOrder.size() != argument.length) {
+				throw new NoSuchObjectException("Prefix and Argument Are Not The Same Length.");
+			}
 			// get string will replace
 			int position = 0;
 			String[] values;
@@ -139,8 +99,6 @@ public class ConsoleLogImpl implements ConsoleLog {
 					}
 				}
 			}
-		} catch (NoSuchObjectException e) {
-			e.printStackTrace();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		} catch (UnsupportedDataTypeException e) {
@@ -149,6 +107,8 @@ public class ConsoleLogImpl implements ConsoleLog {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
+		} catch (NoSuchObjectException e) {
+			e.printStackTrace();
 		}
 
 		return res;
@@ -156,19 +116,9 @@ public class ConsoleLogImpl implements ConsoleLog {
 
 	@Override
 	public <E> void logWarning(String warning, E... arg) {
-
-		// Object t = new String[] {"fsdfsdf", "fsfsdfsdf"};
-		// System.out.println(t.getClass().isArray());
-		//
-		// Object c = new String("fsdfsdf");
-		// System.out.println(c.getClass().isArray());
-
-		// for(int index = 0; index < arg.length; index++) {
-		// System.out.println("Value " + arg.getClass().getTypeName());
-		// }
-		//
-		// System.out.println("E0" + arg.getClass().isArray());
-
+		String rewrite = getLogWarning(warning, arg);
+		System.err.println(TraceLogConstants.ANSI_WHITE_BACKGROUND + TraceLogConstants.ANSI_BLUE + rewrite + " "
+				+ TraceLogConstants.ANSI_RESET);
 	}
 
 	@Override
@@ -180,26 +130,34 @@ public class ConsoleLogImpl implements ConsoleLog {
 
 	@Override
 	public <E> void logError(String error, E... arg) {
-
+		String rewrite = getLogError(error, arg);
+		System.err.println(TraceLogConstants.ANSI_WHITE_BACKGROUND + TraceLogConstants.ANSI_BLUE + rewrite + " "
+				+ TraceLogConstants.ANSI_RESET);
 	}
 
 	@Override
-	public <E> String getLogError(String error, E... arguments) {
+	public <E> String getLogError(String error, E... argument) {
 
-		return null;
+		StringBuilder rewrite = new StringBuilder(
+				" [ " + TraceLogUtils.StringUtils.StringformatDate(TraceLogUtils.FORMAT_DATE_HHMMSS)
+						+ " ERROR ] ".concat(this.formatToConsoleLog(error, argument)));
+		return rewrite.toString();
 	}
 
 	@Override
-	public <E> String getLogWarning(String warning, E... arguments) {
+	public <E> String getLogWarning(String warning, E... argument) {
 
-		return null;
+		StringBuilder rewrite = new StringBuilder(
+				" [ " + TraceLogUtils.StringUtils.StringformatDate(TraceLogUtils.FORMAT_DATE_HHMMSS)
+						+ " WARNING ] ".concat(this.formatToConsoleLog(warning, argument)));
+		return rewrite.toString();
 	}
 
 	@Override
 	public <E> String getLogInfor(String infor, E... argument) {
 
 		StringBuilder rewrite = new StringBuilder(
-				" [ " + TraceLogUtils.StringformatDate(TraceLogUtils.FORMAT_DATE_HHMMSS)
+				" [ " + TraceLogUtils.StringUtils.StringformatDate(TraceLogUtils.FORMAT_DATE_HHMMSS)
 						+ " INFOR ] ".concat(this.formatToConsoleLog(infor, argument)));
 		return rewrite.toString();
 	}
