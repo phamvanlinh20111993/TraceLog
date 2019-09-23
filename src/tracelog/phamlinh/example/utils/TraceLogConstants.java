@@ -43,8 +43,8 @@ public class TraceLogConstants {
 	public final static String REGEX_BOOLEAN = "bl"; // << >>
 	public final static String REGEX_TYPE_BOOLEAN = "Boolean";
 
-	public final static String REGEX_ARRAY_OPEN_PARRENTHESES = "[";// "😢「"; // 「 value �?
-	public final static String REGEX_ARRAY_CLOSE_PARRENTHESES = "]";// "�?😢";
+	public final static String REGEX_ARRAY_OPEN_PARRENTHESES = "#[";// "😢「"; // 「 value �?
+	public final static String REGEX_ARRAY_CLOSE_PARRENTHESES = "]#";// "�?😢";
 
 	public final static String REGEX_TYPE_ARRAY = "Array";
 

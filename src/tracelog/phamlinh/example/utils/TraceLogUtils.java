@@ -330,6 +330,70 @@ public class TraceLogUtils {
 
 	/**
 	 * 
+	 * @param key
+	 * @param object
+	 * @return
+	 */
+	public static <T> Boolean checkObjectType(String key, T object) {
+
+		Boolean res;
+		switch (key) {
+		case TraceLogConstants.REGEX_TYPE_VALUE:
+			res = true;
+			break;
+		case TraceLogConstants.REGEX_TYPE_ARGUMENT:
+			res = true;
+			break;
+		case TraceLogConstants.REGEX_TYPE_NUMBER:
+			res = object instanceof Number;
+			break;
+		case TraceLogConstants.REGEX_TYPE_STRING:
+			res = object instanceof String;
+			break;
+		case TraceLogConstants.REGEX_TYPE_CHAR:
+			res = object instanceof Character;
+			break;
+		case TraceLogConstants.REGEX_TYPE_OBJECT:
+			res = !CheckJavaUtils.isJavaLangObject(object);
+			break;
+		case TraceLogConstants.REGEX_TYPE_BOOLEAN:
+			res = object instanceof Boolean;
+			break;
+		// update version
+		case TraceLogConstants.REGEX_TYPE_FLOAT_NUMBER:
+			res = object instanceof Float;
+			break;
+		case TraceLogConstants.REGEX_TYPE_DOUBLE_NUMBER:
+			res = object instanceof Double;
+			break;
+		case TraceLogConstants.COLLECTION_TYPE_LIST:
+			res = object instanceof List<?>;
+			break;
+		case TraceLogConstants.COLLECTION_TYPE_MAP:
+			res = object instanceof Map<?, ?>;
+			break;
+		case TraceLogConstants.COLLECTION_TYPE_SET:
+			res = object instanceof Set<?>;
+			break;
+		case TraceLogConstants.COLLECTION_TYPE_QUEUE:
+			res = object instanceof Queue<?>;
+			break;
+		case TraceLogConstants.COLLECTION_TYPE_VECTOR:
+			res = object instanceof Vector<?>;
+			break;
+		case TraceLogConstants.COLLECTION_TYPE_STACK:
+			res = object instanceof Stack<?>;
+			break;
+		default:
+			res = false;
+			break;
+		}
+
+		return res;
+	}
+
+	/**
+	 * 
 	 * @param number
 	 * @param previouDecimalPoint
 	 * @param afterDecimalPoint
@@ -588,13 +652,18 @@ public class TraceLogUtils {
 				value = isArray ? TraceLogConstants.REGEX_ARRAY_OPEN_PARRENTHESES : "null";
 			}
 			int length = value.length();
-			value = value.substring(0, length < 2 ? length : length - 2);
+		
+			value = value.substring(0,
+					length < 2 * TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES.length() ? length : length - 2);
 			value += isArray ? TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES : "";
 			res = res.append("`" + key + "`".concat(" : \"" + value + "\"").concat(", "));
 		}
 
 		int length = res.toString().length();
-		return res.toString().substring(0, (length < 2 ? 2 : length) - 2);
+		return res.toString().substring(0,
+				(length < 2 * TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES.length()
+						? 2 * TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES.length()
+						: length) - 2);
 	}
 
 	/**

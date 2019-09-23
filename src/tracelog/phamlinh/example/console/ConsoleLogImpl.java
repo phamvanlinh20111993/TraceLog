@@ -71,6 +71,7 @@ public class ConsoleLogImpl implements ConsoleLog {
 			if (prefixListOrder.size() != argument.length) {
 				throw new NoSuchObjectException("Prefix and Argument Are Not The Same Length.");
 			}
+			
 			// get string will replace
 			int position = 0;
 			String[] values;
@@ -79,6 +80,7 @@ public class ConsoleLogImpl implements ConsoleLog {
 			for (Map.Entry<Integer, RegexCondition> entry : prefixListOrder.entrySet()) {
 				for (int index = 0; index < TraceLogConstants.REGEX_LIST.length; index++) {
 					if (TraceLogConstants.REGEX_LIST[index].equals(entry.getValue().getSignalPrefix())) {
+						
 						values = TraceLogUtils.convertElementTypeToString(argument[position++], entry.getValue());
 						// object is single
 						String regex = "";

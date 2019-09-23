@@ -60,7 +60,7 @@ public class Main {
 		}, new Integer(30));  
 		
 		
-		console.logError("%%n0.28f <> %%n + %%n and %%{n} = %%{n}", 0423423.554353454535345f, new Integer(32), 3243, 
+		console.logError("%%n7.2f <> %%n + %%n and %%{n} = %%{n}", 0423423.554353454535345f, new Integer(32), 3243, 
 				new short[] {1, 1, 23}, new short[] {1, 1, 23});
 		
 		console.logInfo("%%ob <> %%ob and %%bl",  new KeyPairValue("karteId", "customerName"), 
