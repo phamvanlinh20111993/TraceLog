@@ -20,12 +20,12 @@ public class Main {
 		ConsoleLogImpl console = new ConsoleLogImpl();
 
 		console.logError("Can not find value for arguments: %%va. and %%ag and %%ag --- and %%ag",
-				new String[] { "name"}, 
-				new String[] { "qt3" },
-				new String[] { "n23r23ame"},
-				new String[] { "nr23r23Wame"});
+				new String("name"), 
+				new String("qt3"),
+				new String("n23r23ame"),
+				new String("nr23r23Wame"));
 
-		console.logInfo("Value not match for this argument: %%ag <> %%va", 
+		console.logInfo("Value not match for this argument: %%{ag} <> %%{va}", 
 				new String[] { "name" },
 				new String[] { "Pham Van Linh" });
 
@@ -80,8 +80,12 @@ public class Main {
 		testB.put("444", 132);
 		testB.put("233", 2);
 		
-		console.logWarning("Show list object number collection: %%{n} = %%n and  %%{n}", 
+		console.logWarning("Show list object number collection: %%{n} = %%n and  %%{ag}", 
 				testA, new Integer(30), testB);  
+		
+		byte tmp = 122;
+		console.logWarning("Check type boolean and byte: %%bl = %%by", 
+				new Boolean(true), tmp );  
 		
 //		Map<String, String> abc = new HashMap<>();
 //		abc.put("fas", "gdfdgdf");

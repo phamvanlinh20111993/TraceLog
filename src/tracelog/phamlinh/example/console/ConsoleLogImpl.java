@@ -55,6 +55,40 @@ public class ConsoleLogImpl implements ConsoleLog {
 
 	/**
 	 * 
+	 * @param prefixMap
+	 * @param argurment
+	 */
+	private <E> void checkMapPrefixAndObjectType(Map<Integer, RegexCondition> prefixListOrder, E... argument)
+			throws NullPointerException, NoSuchObjectException {
+
+		if (argument == null)
+			throw new NoSuchObjectException("Argument can not be null.");
+
+		if (prefixListOrder.size() != argument.length)
+			throw new NoSuchObjectException("Prefix and Argument Are Not The Same Length.");
+
+		int position = 0;
+		for (Map.Entry<Integer, RegexCondition> entry : prefixListOrder.entrySet()) {
+			for (int index = 0; index < TraceLogConstants.REGEX_LIST.length; index++) {
+				if (TraceLogConstants.REGEX_LIST[index].equals(entry.getValue().getSignalPrefix())) {
+
+					if (!TraceLogUtils.checkObjectType(TraceLogConstants.REGEX_TYPE[index], argument[position])
+							|| (argument[position].getClass().isArray()
+									|| TraceLogUtils.CheckJavaUtils.isJavaUtilCollection(argument[position])
+									|| TraceLogUtils.CheckJavaUtils.isJavaUtilMap(argument[position])) != entry
+											.getValue().isArray()) {
+
+						throw new NoSuchObjectException("Prefix " + entry.getValue().getRegex() + " Not Match For Type "
+								+ argument[position].getClass().getTypeName());
+					}
+					position++;
+				}
+			}
+		}
+	}
+
+	/**
+	 * 
 	 * @param string
 	 * @param argument
 	 * @return
@@ -64,14 +98,8 @@ public class ConsoleLogImpl implements ConsoleLog {
 
 		Map<Integer, RegexCondition> prefixListOrder = getPrefixListOnString(string);
 		try {
-
-			if (argument == null) {
-				throw new NoSuchObjectException("Argument can not be null.");
-			}
-			if (prefixListOrder.size() != argument.length) {
-				throw new NoSuchObjectException("Prefix and Argument Are Not The Same Length.");
-			}
-			
+			// check condition before execute translate
+			checkMapPrefixAndObjectType(prefixListOrder, argument);
 			// get string will replace
 			int position = 0;
 			String[] values;
@@ -80,7 +108,6 @@ public class ConsoleLogImpl implements ConsoleLog {
 			for (Map.Entry<Integer, RegexCondition> entry : prefixListOrder.entrySet()) {
 				for (int index = 0; index < TraceLogConstants.REGEX_LIST.length; index++) {
 					if (TraceLogConstants.REGEX_LIST[index].equals(entry.getValue().getSignalPrefix())) {
-						
 						values = TraceLogUtils.convertElementTypeToString(argument[position++], entry.getValue());
 						// object is single
 						String regex = "";

@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.SortedSet;
@@ -116,7 +115,7 @@ public class TraceLogUtils {
 	 * @author PhamVanLinh
 	 *
 	 */
-	private static class CheckJavaUtils {
+	public static class CheckJavaUtils {
 		/**
 		 * 
 		 * @param check
@@ -141,6 +140,15 @@ public class TraceLogUtils {
 			}
 
 			return false;
+		}
+
+		/**
+		 * 
+		 * @param check
+		 * @return
+		 */
+		public static <E> boolean isJavaPrimitiveA(E check) {
+			return check.getClass().getComponentType().isPrimitive();
 		}
 
 		/**
@@ -336,58 +344,56 @@ public class TraceLogUtils {
 	 */
 	public static <T> Boolean checkObjectType(String key, T object) {
 
-		Boolean res;
-		switch (key) {
-		case TraceLogConstants.REGEX_TYPE_VALUE:
-			res = true;
-			break;
-		case TraceLogConstants.REGEX_TYPE_ARGUMENT:
-			res = true;
-			break;
-		case TraceLogConstants.REGEX_TYPE_NUMBER:
-			res = object instanceof Number;
-			break;
-		case TraceLogConstants.REGEX_TYPE_STRING:
-			res = object instanceof String;
-			break;
-		case TraceLogConstants.REGEX_TYPE_CHAR:
-			res = object instanceof Character;
-			break;
-		case TraceLogConstants.REGEX_TYPE_OBJECT:
-			res = !CheckJavaUtils.isJavaLangObject(object);
-			break;
-		case TraceLogConstants.REGEX_TYPE_BOOLEAN:
-			res = object instanceof Boolean;
-			break;
-		// update version
-		case TraceLogConstants.REGEX_TYPE_FLOAT_NUMBER:
-			res = object instanceof Float;
-			break;
-		case TraceLogConstants.REGEX_TYPE_DOUBLE_NUMBER:
-			res = object instanceof Double;
-			break;
-		case TraceLogConstants.COLLECTION_TYPE_LIST:
-			res = object instanceof List<?>;
-			break;
-		case TraceLogConstants.COLLECTION_TYPE_MAP:
-			res = object instanceof Map<?, ?>;
-			break;
-		case TraceLogConstants.COLLECTION_TYPE_SET:
-			res = object instanceof Set<?>;
-			break;
-		case TraceLogConstants.COLLECTION_TYPE_QUEUE:
-			res = object instanceof Queue<?>;
-			break;
-		case TraceLogConstants.COLLECTION_TYPE_VECTOR:
-			res = object instanceof Vector<?>;
-			break;
-		case TraceLogConstants.COLLECTION_TYPE_STACK:
-			res = object instanceof Stack<?>;
-			break;
-		default:
-			res = false;
-			break;
+		Boolean res = false;
+		String typeCheck = object.getClass().getTypeName();
+		/**
+		 * have some problems with primitive type :(((
+		 */
+		if (object.getClass().isArray() && !object.getClass().getComponentType().isPrimitive()) {
+			Object[] arrayObject = (Object[]) object;
+			object = (T) arrayObject[0];
 		}
+
+		if (CheckJavaUtils.isJavaUtilCollection(object)) {
+			Collection<?> listObject = (Collection<?>) object;
+			object = (T) listObject.iterator().next();
+		}
+
+		if (key == TraceLogConstants.REGEX_TYPE_VALUE || TraceLogConstants.REGEX_TYPE_ARGUMENT == key)
+			res = true;
+
+		if (TraceLogConstants.REGEX_TYPE_NUMBER == key)
+			res = object instanceof Double || object instanceof Float || object instanceof Long
+					|| object instanceof Short || object instanceof Number
+					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_SHORT)
+					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_SHORT + TraceLogConstants.PRIMITIVE_TYPE_ARRAY)
+					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_LONG)
+					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_LONG + TraceLogConstants.PRIMITIVE_TYPE_ARRAY)
+					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_INTEGER)
+					|| typeCheck
+							.equals(TraceLogConstants.PRIMITIVE_TYPE_INTEGER + TraceLogConstants.PRIMITIVE_TYPE_ARRAY)
+					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_FLOAT)
+					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_FLOAT + TraceLogConstants.PRIMITIVE_TYPE_ARRAY)
+					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_DOUBLE) || typeCheck
+							.equals(TraceLogConstants.PRIMITIVE_TYPE_DOUBLE + TraceLogConstants.PRIMITIVE_TYPE_ARRAY);
+
+		if (key == TraceLogConstants.REGEX_TYPE_STRING)
+			res = object instanceof String || object instanceof String[];
+
+		if (key == TraceLogConstants.REGEX_TYPE_CHAR)
+			res = object instanceof Character || typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_CHAR)
+					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_CHAR + TraceLogConstants.PRIMITIVE_TYPE_ARRAY);
+
+		if (key == TraceLogConstants.REGEX_TYPE_OBJECT)
+			res = !CheckJavaUtils.isJavaLangObject(object);
+
+		if (key == TraceLogConstants.REGEX_TYPE_BOOLEAN)
+			res = object instanceof Boolean || typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_BOOLEAN) || typeCheck
+					.equals(TraceLogConstants.PRIMITIVE_TYPE_BOOLEAN + TraceLogConstants.PRIMITIVE_TYPE_ARRAY);
+
+		if (key == TraceLogConstants.REGEX_TYPE_BYTE)
+			res = object instanceof Byte || typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_BYTE)
+					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_BYTE + TraceLogConstants.PRIMITIVE_TYPE_ARRAY);
 
 		return res;
 	}
@@ -531,12 +537,6 @@ public class TraceLogUtils {
 		case TraceLogConstants.REGEX_TYPE_NUMBER:
 			res = res.append(StringUtils.joinString(value, "\\$\\{", "\\}"));
 			break;
-		case TraceLogConstants.REGEX_TYPE_FLOAT_NUMBER:
-			res = res.append(StringUtils.joinString(value, "\\$\\{", "\\}"));
-			break;
-		case TraceLogConstants.REGEX_TYPE_DOUBLE_NUMBER:
-			res = res.append(StringUtils.joinString(value, "\\$\\{", "\\}"));
-			break;
 		case TraceLogConstants.REGEX_TYPE_STRING:
 			res = res.append(StringUtils.joinString(value, "\"", "\""));
 			break;
@@ -545,6 +545,9 @@ public class TraceLogUtils {
 			break;
 		case TraceLogConstants.REGEX_TYPE_OBJECT:
 			res = res.append(StringUtils.joinString(value, "\\@\\{", "\\}"));
+			break;
+		case TraceLogConstants.REGEX_TYPE_BYTE:
+			res = res.append(StringUtils.joinString(value, "\\#\\(", "\\)"));
 			break;
 		case TraceLogConstants.REGEX_TYPE_BOOLEAN:
 			res = res.append(StringUtils.joinString(value, "<<", ">>"));
@@ -652,7 +655,7 @@ public class TraceLogUtils {
 				value = isArray ? TraceLogConstants.REGEX_ARRAY_OPEN_PARRENTHESES : "null";
 			}
 			int length = value.length();
-		
+
 			value = value.substring(0,
 					length < 2 * TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES.length() ? length : length - 2);
 			value += isArray ? TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES : "";
@@ -723,4 +726,5 @@ public class TraceLogUtils {
 
 		return stringMap;
 	}
+
 }
