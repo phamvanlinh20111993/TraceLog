@@ -209,8 +209,12 @@ public class TraceLogUtils {
 	 * 
 	 * @param argument
 	 * @return
+	 * @throws NullPointerException
+	 * @throws UnsupportedDataTypeException
+	 * @throws NumberFormatException
 	 */
-	private static <E> List<String> convertPrimitiveTypeToString(E argument) {
+	private static <E> List<String> convertPrimitiveTypeToString(E argument, RegexCondition condition)
+			throws NumberFormatException, UnsupportedDataTypeException, NullPointerException {
 		List<String> response = new ArrayList<String>();
 		String typeCheck = argument.getClass().getTypeName();
 
@@ -219,64 +223,60 @@ public class TraceLogUtils {
 			response.add(Short.toString(sho));
 		} else if (typeCheck
 				.equals(TraceLogConstants.PRIMITIVE_TYPE_SHORT.concat(TraceLogConstants.PRIMITIVE_TYPE_ARRAY))) {
-			short[] shoL = (short[]) argument;
-			for (short sho : shoL)
+			for (short sho : (short[]) argument)
 				response.add(Short.toString(sho));
 		} else if (typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_INTEGER)) {
 			int in = (int) argument;
 			response.add(Integer.toString(in));
 		} else if (typeCheck
 				.equals(TraceLogConstants.PRIMITIVE_TYPE_INTEGER.concat(TraceLogConstants.PRIMITIVE_TYPE_ARRAY))) {
-			int[] inL = (int[]) argument;
-			for (int in : inL)
+			for (int in : (int[]) argument)
 				response.add(Integer.toString(in));
 		} else if (typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_CHAR)) {
 			char ch = (char) argument;
 			response.add(Character.toString(ch));
 		} else if (typeCheck
 				.equals(TraceLogConstants.PRIMITIVE_TYPE_CHAR.concat(TraceLogConstants.PRIMITIVE_TYPE_ARRAY))) {
-			char[] chL = (char[]) argument;
-			for (char ch : chL)
+			for (char ch : (char[]) argument)
 				response.add(Character.toString(ch));
 		} else if (typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_DOUBLE)) {
 			double dou = (double) argument;
-			response.add(Double.toString(dou));
+			response.add(TraceLogUtils.addPrefixNumber((Number) dou, Integer.valueOf(condition.getNaturePath()),
+					Integer.valueOf(condition.getDecimal())));
 		} else if (typeCheck
 				.equals(TraceLogConstants.PRIMITIVE_TYPE_DOUBLE.concat(TraceLogConstants.PRIMITIVE_TYPE_ARRAY))) {
-			double[] douL = (double[]) argument;
-			for (double dou : douL)
-				response.add(Double.toString(dou));
+			for (double dou : (double[]) argument)
+				response.add(TraceLogUtils.addPrefixNumber((Number) dou, Integer.valueOf(condition.getNaturePath()),
+						Integer.valueOf(condition.getDecimal())));
 		} else if (typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_FLOAT)) {
 			float flo = (float) argument;
-			response.add(Float.toString(flo));
+			response.add(TraceLogUtils.addPrefixNumber((Number) flo, Integer.valueOf(condition.getNaturePath()),
+					Integer.valueOf(condition.getDecimal())));
 		} else if (typeCheck
 				.equals(TraceLogConstants.PRIMITIVE_TYPE_FLOAT.concat(TraceLogConstants.PRIMITIVE_TYPE_ARRAY))) {
-			float[] folL = (float[]) argument;
-			for (float fol : folL)
-				response.add(Float.toString(fol));
+			for (float flo : (float[]) argument)
+				response.add(TraceLogUtils.addPrefixNumber((Number) flo, Integer.valueOf(condition.getNaturePath()),
+						Integer.valueOf(condition.getDecimal())));
 		} else if (typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_LONG)) {
 			long lo = (long) argument;
 			response.add(Long.toString(lo));
 		} else if (typeCheck
 				.equals(TraceLogConstants.PRIMITIVE_TYPE_LONG.concat(TraceLogConstants.PRIMITIVE_TYPE_ARRAY))) {
-			long[] loL = (long[]) argument;
-			for (long lo : loL)
+			for (long lo : (long[]) argument)
 				response.add(Long.toString(lo));
 		} else if (typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_BYTE)) {
 			byte byt = (byte) argument;
 			response.add(Byte.toString(byt));
 		} else if (typeCheck
 				.equals(TraceLogConstants.PRIMITIVE_TYPE_BYTE.concat(TraceLogConstants.PRIMITIVE_TYPE_ARRAY))) {
-			byte[] bytL = (byte[]) argument;
-			for (byte byt : bytL)
+			for (byte byt : (byte[]) argument)
 				response.add(Float.toString(byt));
 		} else if (typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_BOOLEAN)) {
 			boolean bool = (boolean) argument;
 			response.add(Boolean.toString(bool));
 		} else if (typeCheck
 				.equals(TraceLogConstants.PRIMITIVE_TYPE_BOOLEAN.concat(TraceLogConstants.PRIMITIVE_TYPE_ARRAY))) {
-			boolean[] boolL = (boolean[]) argument;
-			for (boolean bool : boolL)
+			for (boolean bool : (boolean[]) argument)
 				response.add(Boolean.toString(bool));
 		}
 
@@ -299,37 +299,32 @@ public class TraceLogUtils {
 			response.add(TraceLogUtils.addPrefixNumber((Number) argument, Integer.valueOf(condition.getNaturePath()),
 					Integer.valueOf(condition.getDecimal())));
 		} else if (argument instanceof Number[]) {
-			Number[] inL = (Number[]) argument;
-			for (Number in : inL)
+			for (Number in : (Number[]) argument)
 				response.add(TraceLogUtils.addPrefixNumber(in, Integer.valueOf(condition.getNaturePath()),
 						Integer.valueOf(condition.getDecimal())));
 		} else if (argument instanceof Character) {
 			Character ch = (Character) argument;
 			response.add(Character.toString(ch));
 		} else if (argument instanceof Character[]) {
-			Character[] chL = (Character[]) argument;
-			for (Character ch : chL)
+			for (Character ch : (Character[]) argument)
 				response.add(Character.toString(ch));
 		} else if (argument instanceof Byte) {
 			Byte byt = (Byte) argument;
 			response.add(Byte.toString(byt));
 		} else if (argument instanceof Byte[]) {
-			Byte[] bytL = (Byte[]) argument;
-			for (Byte byt : bytL)
+			for (Byte byt : (Byte[]) argument)
 				response.add(Float.toString(byt));
 		} else if (argument instanceof Boolean) {
 			Boolean bool = (Boolean) argument;
 			response.add(Boolean.toString(bool));
 		} else if (argument instanceof Boolean[]) {
-			Boolean[] boolL = (Boolean[]) argument;
-			for (Boolean bool : boolL)
+			for (Boolean bool : (Boolean[]) argument)
 				response.add(Boolean.toString(bool));
 		} else if (argument instanceof String) {
 			String string = (String) argument;
 			response.add(string);
 		} else if (argument instanceof String[]) {
-			String[] stringL = (String[]) argument;
-			for (String string : stringL)
+			for (String string : (String[]) argument)
 				response.add(string);
 		}
 
@@ -353,12 +348,10 @@ public class TraceLogUtils {
 			Object[] arrayObject = (Object[]) object;
 			object = (T) arrayObject[0];
 		}
-
 		if (CheckJavaUtils.isJavaUtilCollection(object)) {
 			Collection<?> listObject = (Collection<?>) object;
 			object = (T) listObject.iterator().next();
 		}
-
 		if (key == TraceLogConstants.REGEX_TYPE_VALUE || TraceLogConstants.REGEX_TYPE_ARGUMENT == key)
 			res = true;
 
@@ -508,7 +501,7 @@ public class TraceLogUtils {
 			}
 		} else {
 			if (CheckJavaUtils.isJavaPrimitive(argument)) {
-				response.addAll(convertPrimitiveTypeToString(argument));
+				response.addAll(convertPrimitiveTypeToString(argument, condition));
 			} else if (CheckJavaUtils.isJavaLangObject(argument)) {
 				response.addAll(convertWrapperTypeToString(argument, condition));
 			} else {

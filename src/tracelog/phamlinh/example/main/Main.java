@@ -70,6 +70,8 @@ public class Main {
 		// https://www.codingunit.com/printf-format-specifiers-format-conversions-and-formatted-output
 		console.logInfo("value = %%n", new Float[] {42423.32576567567563f});
 		
+		console.logInfo("value test array double: %%{n14.6f}", new double[] {42423.32576567567563d, 234234.423423d});
+		
 		List<Long> testA = new ArrayList<>();
 		testA.add(1L);
 		testA.add(2L);
