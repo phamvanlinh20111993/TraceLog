@@ -1,7 +1,6 @@
 package tracelog.phamlinh.example.utils;
 
 import java.lang.reflect.Field;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,27 +10,21 @@ import java.util.IllegalFormatException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.Stack;
-import java.util.TreeMap;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Map.Entry;
 
 import javax.activation.UnsupportedDataTypeException;
 
-import tracelog.phamlinh.example.object.RegexCondition;
 import tracelog.phamlinh.example.object.TransferMapToObject;
 
 public class TraceLogUtils {
 
 	public static final String FORMAT_DATE_HHMMSS = "HH:mm:ss";
 	public static final String FORMAT_DATE_YYYYMMDDHHMMSSA = "yyyy-MM-dd hh:mm:ss a";
-	public static final Integer MAX_PREVIOUS_DECIMAL_POINT = 100;
-	public static final Integer MAX_AFTER_DECIMAL_POINT = 100;
 
 	/**
 	 * 
@@ -61,6 +54,15 @@ public class TraceLogUtils {
 		 */
 		public static boolean isEmpty(String string) {
 			return string != null && string != "";
+		}
+
+		/**
+		 * 
+		 * @param string
+		 * @return
+		 */
+		public static boolean isEmpty(String[] string) {
+			return string != null && string.length > 0;
 		}
 
 		/**
@@ -209,11 +211,11 @@ public class TraceLogUtils {
 	 * 
 	 * @param argument
 	 * @return
-	 * @throws NullPointerException
-	 * @throws UnsupportedDataTypeException
 	 * @throws NumberFormatException
+	 * @throws UnsupportedDataTypeException
+	 * @throws NullPointerException
 	 */
-	private static <E> List<String> convertPrimitiveTypeToString(E argument, RegexCondition condition)
+	public static <E> List<String> primitiveTypeToListStr(E argument)
 			throws NumberFormatException, UnsupportedDataTypeException, NullPointerException {
 		List<String> response = new ArrayList<String>();
 		String typeCheck = argument.getClass().getTypeName();
@@ -241,22 +243,18 @@ public class TraceLogUtils {
 				response.add(Character.toString(ch));
 		} else if (typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_DOUBLE)) {
 			double dou = (double) argument;
-			response.add(TraceLogUtils.addPrefixNumber((Number) dou, Integer.valueOf(condition.getNaturePath()),
-					Integer.valueOf(condition.getDecimal())));
+			response.add(Double.toString(dou));
 		} else if (typeCheck
 				.equals(TraceLogConstants.PRIMITIVE_TYPE_DOUBLE.concat(TraceLogConstants.PRIMITIVE_TYPE_ARRAY))) {
 			for (double dou : (double[]) argument)
-				response.add(TraceLogUtils.addPrefixNumber((Number) dou, Integer.valueOf(condition.getNaturePath()),
-						Integer.valueOf(condition.getDecimal())));
+				response.add(Double.toString(dou));
 		} else if (typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_FLOAT)) {
 			float flo = (float) argument;
-			response.add(TraceLogUtils.addPrefixNumber((Number) flo, Integer.valueOf(condition.getNaturePath()),
-					Integer.valueOf(condition.getDecimal())));
+			response.add(Float.toString(flo));
 		} else if (typeCheck
 				.equals(TraceLogConstants.PRIMITIVE_TYPE_FLOAT.concat(TraceLogConstants.PRIMITIVE_TYPE_ARRAY))) {
 			for (float flo : (float[]) argument)
-				response.add(TraceLogUtils.addPrefixNumber((Number) flo, Integer.valueOf(condition.getNaturePath()),
-						Integer.valueOf(condition.getDecimal())));
+				response.add(Float.toString(flo));
 		} else if (typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_LONG)) {
 			long lo = (long) argument;
 			response.add(Long.toString(lo));
@@ -291,17 +289,15 @@ public class TraceLogUtils {
 	 * @throws UnsupportedDataTypeException
 	 * @throws NumberFormatException
 	 */
-	private static <E> List<String> convertWrapperTypeToString(E argument, RegexCondition condition)
+	public static <E> List<String> wrapperTypeToListStr(E argument)
 			throws NumberFormatException, UnsupportedDataTypeException, NullPointerException {
 		List<String> response = new ArrayList<String>();
 
 		if (argument instanceof Number) {
-			response.add(TraceLogUtils.addPrefixNumber((Number) argument, Integer.valueOf(condition.getNaturePath()),
-					Integer.valueOf(condition.getDecimal())));
+			response.add(argument.toString());
 		} else if (argument instanceof Number[]) {
 			for (Number in : (Number[]) argument)
-				response.add(TraceLogUtils.addPrefixNumber(in, Integer.valueOf(condition.getNaturePath()),
-						Integer.valueOf(condition.getDecimal())));
+				response.add(in.toString());
 		} else if (argument instanceof Character) {
 			Character ch = (Character) argument;
 			response.add(Character.toString(ch));
@@ -333,240 +329,6 @@ public class TraceLogUtils {
 
 	/**
 	 * 
-	 * @param key
-	 * @param object
-	 * @return
-	 */
-	public static <T> Boolean checkObjectType(String key, T object) {
-
-		Boolean res = false;
-		String typeCheck = object.getClass().getTypeName();
-		/**
-		 * have some problems with primitive type :(((
-		 */
-		if (object.getClass().isArray() && !object.getClass().getComponentType().isPrimitive()) {
-			Object[] arrayObject = (Object[]) object;
-			object = (T) arrayObject[0];
-		}
-		if (CheckJavaUtils.isJavaUtilCollection(object)) {
-			Collection<?> listObject = (Collection<?>) object;
-			object = (T) listObject.iterator().next();
-		}
-		if (key == TraceLogConstants.REGEX_TYPE_VALUE || TraceLogConstants.REGEX_TYPE_ARGUMENT == key)
-			res = true;
-
-		if (TraceLogConstants.REGEX_TYPE_NUMBER == key)
-			res = object instanceof Double || object instanceof Float || object instanceof Long
-					|| object instanceof Short || object instanceof Number
-					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_SHORT)
-					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_SHORT + TraceLogConstants.PRIMITIVE_TYPE_ARRAY)
-					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_LONG)
-					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_LONG + TraceLogConstants.PRIMITIVE_TYPE_ARRAY)
-					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_INTEGER)
-					|| typeCheck
-							.equals(TraceLogConstants.PRIMITIVE_TYPE_INTEGER + TraceLogConstants.PRIMITIVE_TYPE_ARRAY)
-					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_FLOAT)
-					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_FLOAT + TraceLogConstants.PRIMITIVE_TYPE_ARRAY)
-					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_DOUBLE) || typeCheck
-							.equals(TraceLogConstants.PRIMITIVE_TYPE_DOUBLE + TraceLogConstants.PRIMITIVE_TYPE_ARRAY);
-
-		if (key == TraceLogConstants.REGEX_TYPE_STRING)
-			res = object instanceof String || object instanceof String[];
-
-		if (key == TraceLogConstants.REGEX_TYPE_CHAR)
-			res = object instanceof Character || typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_CHAR)
-					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_CHAR + TraceLogConstants.PRIMITIVE_TYPE_ARRAY);
-
-		if (key == TraceLogConstants.REGEX_TYPE_OBJECT)
-			res = !CheckJavaUtils.isJavaLangObject(object);
-
-		if (key == TraceLogConstants.REGEX_TYPE_BOOLEAN)
-			res = object instanceof Boolean || typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_BOOLEAN) || typeCheck
-					.equals(TraceLogConstants.PRIMITIVE_TYPE_BOOLEAN + TraceLogConstants.PRIMITIVE_TYPE_ARRAY);
-
-		if (key == TraceLogConstants.REGEX_TYPE_BYTE)
-			res = object instanceof Byte || typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_BYTE)
-					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_BYTE + TraceLogConstants.PRIMITIVE_TYPE_ARRAY);
-
-		return res;
-	}
-
-	/**
-	 * 
-	 * @param number
-	 * @param previouDecimalPoint
-	 * @param afterDecimalPoint
-	 * @return
-	 * @throws UnsupportedDataTypeException
-	 */
-	private static String addPrefixNumber(Number number, Integer previouDecimalPoint, Integer afterDecimalPoint)
-			throws UnsupportedDataTypeException, NullPointerException {
-		String res = "";
-		if ((number instanceof Integer || number instanceof Long || number instanceof Short || number instanceof Byte)
-				&& (previouDecimalPoint > 0 || afterDecimalPoint > 0)) {
-			throw new UnsupportedDataTypeException("Unsupported for type " + number.getClass().getTypeName());
-		} else if (!(number instanceof Integer || number instanceof Long || number instanceof Short)
-				&& (previouDecimalPoint > 0 || afterDecimalPoint > 0)) {
-			previouDecimalPoint = previouDecimalPoint > MAX_PREVIOUS_DECIMAL_POINT ? MAX_PREVIOUS_DECIMAL_POINT
-					: previouDecimalPoint;
-			afterDecimalPoint = afterDecimalPoint > MAX_AFTER_DECIMAL_POINT ? MAX_AFTER_DECIMAL_POINT
-					: afterDecimalPoint;
-
-			if (number instanceof Float || number instanceof Double) {
-				String formattingFloatingPoint = "";
-				if (previouDecimalPoint <= 25 || afterDecimalPoint <= 25) {
-					formattingFloatingPoint = StringUtils.repeatStart("", "#", previouDecimalPoint) + "."
-							+ StringUtils.repeatStart("", "#", afterDecimalPoint);
-					DecimalFormat formatDecimal = new DecimalFormat(formattingFloatingPoint);
-					res = formatDecimal.format(number);
-				} else {
-					formattingFloatingPoint = "%" + previouDecimalPoint + "." + afterDecimalPoint + "f";
-					res = String.format(formattingFloatingPoint, number);
-				}
-			} else {
-				throw new UnsupportedDataTypeException("Unsupported for type " + number.getClass().getTypeName());
-			}
-		} else {
-			res = number.toString();
-		}
-
-		return res;
-	}
-
-	/**
-	 * 
-	 * @param string
-	 * @param key
-	 * @return
-	 */
-	public static Map<Integer, RegexCondition> getPrefixOnString(String string, String key) {
-
-		Map<Integer, RegexCondition> getOrderPrefix = new TreeMap<Integer, RegexCondition>();
-		Boolean isArray = key.charAt(0) == TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES.charAt(0)
-				&& key.charAt(key.length() - 1) == TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES.charAt(0);
-		String prefixKey = key;
-		if (isArray) {
-			int length = key.length();
-			prefixKey = "\\" + key.substring(0, length - 1) + "\\" + key.substring(length - 1, length);
-			key = key.substring(1, length - 1);
-		}
-		Pattern p = Pattern.compile(TraceLogConstants.REGEX_PREFIX.concat(prefixKey));
-		String naturePath, decimalPath;
-		Matcher m = p.matcher(string);
-
-		while (m.find()) {
-			naturePath = "0";
-			decimalPath = "0";
-			if (m.groupCount() > 0) {
-				naturePath = m.group(1) != null ? m.group(1).toString() : naturePath;
-				decimalPath = m.group(2) != null ? m.group(2).toString() : decimalPath;
-			}
-			getOrderPrefix.put(m.start(), new RegexCondition(m.group(), isArray, "", key, "", naturePath, decimalPath));
-		}
-
-		return getOrderPrefix;
-	}
-
-	/**
-	 * 
-	 * @param argument
-	 * @return
-	 * @throws UnsupportedDataTypeException
-	 * @throws IllegalAccessException
-	 * @throws NoSuchFieldException
-	 */
-	public static <E> String[] convertElementTypeToString(E argument, RegexCondition condition)
-			throws UnsupportedDataTypeException, NullPointerException, NoSuchFieldException, IllegalAccessException {
-
-		ArrayList<String> response = new ArrayList<>();
-		if (argument == null)
-			response.add("null");
-
-		if (!CheckJavaUtils.isJavaLangObject(argument)) {
-			if (argument.getClass().isArray()) {
-				Object[] objectList = (Object[]) argument;
-				for (Object object : objectList) {
-					if (object == null)
-						response.add("null");
-					else
-						response.add(convertObjectToString(object));
-				}
-			} else {
-				if (argument instanceof Collection<?>)
-					response.addAll(convertCollectionToString((Collection<?>) argument));
-				else if (argument instanceof Map<?, ?>)
-					response.addAll(convertMapToString((Map<Object, Object>) argument));
-				else
-					response.add(convertObjectToString(argument));
-			}
-		} else {
-			if (CheckJavaUtils.isJavaPrimitive(argument)) {
-				response.addAll(convertPrimitiveTypeToString(argument, condition));
-			} else if (CheckJavaUtils.isJavaLangObject(argument)) {
-				response.addAll(convertWrapperTypeToString(argument, condition));
-			} else {
-				throw new UnsupportedDataTypeException("Unsupported this DataType: " + argument.getClass().getName());
-			}
-		}
-
-		return response.toArray(new String[response.size()]);
-	}
-
-	/**
-	 * 
-	 * @param key
-	 * @param value
-	 * @return
-	 */
-	public static String putValueOnSingle(String key, String[] value) {
-		StringBuilder res = new StringBuilder("");
-		switch (key) {
-		case TraceLogConstants.REGEX_TYPE_VALUE:
-			res = res.append(StringUtils.joinString(value, "\\(", "\\)"));
-			break;
-		case TraceLogConstants.REGEX_TYPE_ARGUMENT:
-			res = res.append(StringUtils.joinString(value, "\\{", "\\}"));
-			break;
-		case TraceLogConstants.REGEX_TYPE_NUMBER:
-			res = res.append(StringUtils.joinString(value, "\\$\\{", "\\}"));
-			break;
-		case TraceLogConstants.REGEX_TYPE_STRING:
-			res = res.append(StringUtils.joinString(value, "\"", "\""));
-			break;
-		case TraceLogConstants.REGEX_TYPE_CHAR:
-			res = res.append(StringUtils.joinString(value, "'", "'"));
-			break;
-		case TraceLogConstants.REGEX_TYPE_OBJECT:
-			res = res.append(StringUtils.joinString(value, "\\@\\{", "\\}"));
-			break;
-		case TraceLogConstants.REGEX_TYPE_BYTE:
-			res = res.append(StringUtils.joinString(value, "\\#\\(", "\\)"));
-			break;
-		case TraceLogConstants.REGEX_TYPE_BOOLEAN:
-			res = res.append(StringUtils.joinString(value, "<<", ">>"));
-			break;
-		default:
-			res = res.append(StringUtils.joinString(value, "|<", ">|"));
-			break;
-		}
-
-		return res.toString();
-	}
-
-	/**
-	 * 
-	 * @param key
-	 * @param value
-	 * @return
-	 */
-	public static String putValueOnArr(String key, String[] value) {
-		StringBuilder res = new StringBuilder(TraceLogConstants.REGEX_ARRAY_OPEN_PARRENTHESES
-				.concat(putValueOnSingle(key, value)).concat(TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES));
-		return res.toString();
-	}
-
-	/**
-	 * 
 	 * @param object
 	 * @return
 	 * @throws NoSuchFieldException
@@ -575,7 +337,7 @@ public class TraceLogUtils {
 	 * @throws UnsupportedDataTypeException
 	 * @throws IllegalArgumentException
 	 */
-	private static <T> String convertObjectToString(T object) throws NoSuchFieldException, IllegalAccessException,
+	public static <T> String objectToStr(T object) throws NoSuchFieldException, IllegalAccessException,
 			NullPointerException, UnsupportedDataTypeException, IllegalArgumentException {
 
 		StringBuilder res = new StringBuilder("");
@@ -639,7 +401,7 @@ public class TraceLogUtils {
 					if (obj != null && !CheckJavaUtils.isJavaLangObject(obj)) {
 						if (!obj.getClass().isArray())
 							value += TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES;
-						value += convertObjectToString(obj) + TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES + ", ";
+						value += objectToStr(obj) + TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES + ", ";
 					} else {
 						value += (obj != null ? obj.toString() : "null") + ", ";
 					}
@@ -672,7 +434,7 @@ public class TraceLogUtils {
 	 * @throws UnsupportedDataTypeException
 	 * @throws IllegalArgumentException
 	 */
-	private static <T> List<String> convertCollectionToString(Collection<?> object) throws NoSuchFieldException,
+	public static <T> List<String> collectionToListStr(Collection<?> object) throws NoSuchFieldException,
 			IllegalAccessException, NullPointerException, UnsupportedDataTypeException, IllegalArgumentException {
 		List<String> stringCollection = new ArrayList<String>();
 
@@ -681,12 +443,12 @@ public class TraceLogUtils {
 		while (iterator.hasNext()) {
 			Object obj = iterator.next();
 			if (!CheckJavaUtils.isJavaLangObject(obj)) {
-				stringCollection.add(convertObjectToString(obj));
+				stringCollection.add(objectToStr(obj));
 			} else {
 				if (CheckJavaUtils.isJavaUtilMap(obj)) {
-					stringCollection.addAll(convertMapToString((Map<Object, Object>) obj));
+					stringCollection.addAll(mapToListStr((Map<Object, Object>) obj));
 				} else if (CheckJavaUtils.isJavaUtilCollection(obj)) {
-					stringCollection.addAll(convertCollectionToString((Collection<?>) obj));
+					stringCollection.addAll(collectionToListStr((Collection<?>) obj));
 				} else {
 					stringCollection.add(obj.toString());
 				}
@@ -706,7 +468,7 @@ public class TraceLogUtils {
 	 * @throws UnsupportedDataTypeException
 	 * @throws IllegalArgumentException
 	 */
-	private static <T> List<String> convertMapToString(Map<Object, Object> object) throws NoSuchFieldException,
+	public static <T> List<String> mapToListStr(Map<Object, Object> object) throws NoSuchFieldException,
 			IllegalAccessException, NullPointerException, UnsupportedDataTypeException, IllegalArgumentException {
 		List<String> stringMap = new ArrayList<String>();
 		Map<Object, Object> collection = object;
@@ -714,7 +476,7 @@ public class TraceLogUtils {
 		while (iterator.hasNext()) {
 			Map.Entry<Object, Object> obj = iterator.next();
 			TransferMapToObject mapToObject = new TransferMapToObject(obj.getKey(), obj.getValue());
-			stringMap.add(convertObjectToString(mapToObject));
+			stringMap.add(objectToStr(mapToObject));
 		}
 
 		return stringMap;
