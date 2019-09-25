@@ -19,9 +19,7 @@ import java.util.Map.Entry;
 
 import javax.activation.UnsupportedDataTypeException;
 
-import tracelog.phamlinh.example.object.RegexCondition;
 import tracelog.phamlinh.example.object.TransferMapToObject;
-import tracelog.phamlinh.example.utils.TraceLogUtils.CheckJavaUtils;
 
 public class TraceLogUtils {
 
