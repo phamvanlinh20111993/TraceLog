@@ -59,7 +59,7 @@ public class TransformDataConsole {
 				response.add(addPrefixNumber((Number) flo, Integer.valueOf(condition.getNaturePath()),
 						Integer.valueOf(condition.getDecimal())));
 		} else {
-			TraceLogUtils.primitiveTypeToListStr(argument);
+			response.addAll(TraceLogUtils.primitiveTypeToListStr(argument));
 		}
 
 		return response;
@@ -85,7 +85,7 @@ public class TransformDataConsole {
 				response.add(addPrefixNumber(in, Integer.valueOf(condition.getNaturePath()),
 						Integer.valueOf(condition.getDecimal())));
 		} else {
-			TraceLogUtils.wrapperTypeToListStr(argument);
+			response.addAll(TraceLogUtils.wrapperTypeToListStr(argument));
 		}
 
 		return response;
@@ -237,7 +237,6 @@ public class TransformDataConsole {
 	 */
 	protected <E> String[] elementTypeToStr(E argument, RegexCondition condition)
 			throws UnsupportedDataTypeException, NullPointerException, NoSuchFieldException, IllegalAccessException {
-
 		ArrayList<String> response = new ArrayList<>();
 		if (argument == null)
 			response.add("null");
@@ -268,7 +267,7 @@ public class TransformDataConsole {
 				throw new UnsupportedDataTypeException("Unsupported this DataType: " + argument.getClass().getName());
 			}
 		}
-
+		
 		return response.toArray(new String[response.size()]);
 	}
 
