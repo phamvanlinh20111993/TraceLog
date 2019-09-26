@@ -10,7 +10,6 @@ public class TransferMapToObject {
 		
 	}
 
-
 	/**
 	 * @param key
 	 * @param value
@@ -20,8 +19,6 @@ public class TransferMapToObject {
 		this.key = key;
 		this.value = value;
 	}
-
-
 
 	/**
 	 * @return the key
@@ -51,6 +48,4 @@ public class TransferMapToObject {
 		this.value = value;
 	}
 	
-	
-
 }

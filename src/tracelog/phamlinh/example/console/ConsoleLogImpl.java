@@ -19,28 +19,28 @@ public class ConsoleLogImpl extends TransformDataConsole implements ConsoleLog {
 	}
 
 	@Override
-	public <E> void logWarning(String warning, E... arg) {
+	public <E> void logWarning(String warning, @SuppressWarnings("unchecked") E... arg) {
 		String rewrite = getLogWarning(warning, arg);
 		System.err.println(TraceLogConstants.ANSI_WHITE_BACKGROUND + TraceLogConstants.ANSI_BLUE + rewrite + " "
 				+ TraceLogConstants.ANSI_RESET);
 	}
 
 	@Override
-	public <E> void logInfo(String infor, E... arg) {
+	public <E> void logInfo(String infor, @SuppressWarnings("unchecked") E... arg) {
 		String rewrite = getLogInfor(infor, arg);
 		System.err.println(TraceLogConstants.ANSI_WHITE_BACKGROUND + TraceLogConstants.ANSI_BLUE + rewrite + " "
 				+ TraceLogConstants.ANSI_RESET);
 	}
 
 	@Override
-	public <E> void logError(String error, E... arg) {
+	public <E> void logError(String error, @SuppressWarnings("unchecked") E... arg) {
 		String rewrite = getLogError(error, arg);
 		System.err.println(TraceLogConstants.ANSI_WHITE_BACKGROUND + TraceLogConstants.ANSI_BLUE + rewrite + " "
 				+ TraceLogConstants.ANSI_RESET);
 	}
 
 	@Override
-	public <E> String getLogError(String error, E... argument) {
+	public <E> String getLogError(String error, @SuppressWarnings("unchecked") E... argument) {
 
 		StringBuilder rewrite = new StringBuilder(
 				" [ " + TraceLogUtils.StringUtils.StringformatDate(TraceLogUtils.FORMAT_DATE_HHMMSS)
@@ -49,7 +49,7 @@ public class ConsoleLogImpl extends TransformDataConsole implements ConsoleLog {
 	}
 
 	@Override
-	public <E> String getLogWarning(String warning, E... argument) {
+	public <E> String getLogWarning(String warning, @SuppressWarnings("unchecked") E... argument) {
 
 		StringBuilder rewrite = new StringBuilder(
 				" [ " + TraceLogUtils.StringUtils.StringformatDate(TraceLogUtils.FORMAT_DATE_HHMMSS)
@@ -58,7 +58,7 @@ public class ConsoleLogImpl extends TransformDataConsole implements ConsoleLog {
 	}
 
 	@Override
-	public <E> String getLogInfor(String infor, E... argument) {
+	public <E> String getLogInfor(String infor, @SuppressWarnings("unchecked") E... argument) {
 
 		StringBuilder rewrite = new StringBuilder(
 				" [ " + TraceLogUtils.StringUtils.StringformatDate(TraceLogUtils.FORMAT_DATE_HHMMSS)

@@ -23,17 +23,17 @@ public class Main {
 				new String("n23r23ame"),
 				new String("nr23r23Wame"));
 
-		console.logInfo("Value not match for this argument: %%{ag} <> %%{va}", 
+		console.logInfo("Value not match for this argument1: %%{ag} <> %%{va}", 
 				new String[] { "name" },
 				new String[] { "Pham Van Linh" });
 
-		console.logInfo("Value not match for list argument: %%{ag} <> %%{va}", 
+		console.logInfo("Value not match for list argument2: %%{ag} <> %%{va}", 
 				new String[] { "name", "gender", "age" },
 				new String[] { "Pham Van Linh", "180", "312313123" }); 
 		
-		console.logInfo("Value not match for list argument: %%{s} <> %%{n}", 
+		console.logInfo("Value not match for list argument3: %%{s} <> %%{n}", 
 				new String[] { "age", "num"},
-				new Integer[] { 312321312, 13213123}); 
+				new float[] { 312321312.232f, 324.32f, 4324.324f, 232323.23423f, 13213123.9f}); 
 	
 		List<RegexCondition> test = new ArrayList<>();
 		test.add(new RegexCondition("aaa", true, "type", "signalPrefix", "format"));
@@ -41,7 +41,7 @@ public class Main {
 		valueTestMap.put("test for key", new RegexCondition("dddđ", true, "we", "ddrưerewdđ", "drweddđ"));
 		console.logWarning("Show list object: %%{ob} = %%{n}", new KeyPairValue[] {
 				new KeyPairValue("karteId", "customerName"), new KeyPairValue("karteId1", "customerName1"), null,
-				new KeyPairValue("karteId2", "customerName2", null, new Integer[] { 1, 2, 3, 4 }),
+				new KeyPairValue("karteId2", "customerName2", null, new Integer[] { -1,312321, 1, 2, 3, 4 }),
 				new KeyPairValue("karteId3", "customerName3"),
 				new KeyPairValue("karteId4", "customerName4", new RegexCondition("aaa", true, "aaa", "aaa", "aaa")),
 				new KeyPairValue(test),

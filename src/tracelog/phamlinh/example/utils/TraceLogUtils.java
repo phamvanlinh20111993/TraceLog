@@ -101,11 +101,10 @@ public class TraceLogUtils {
 			open = open == null ? "" : open;
 			close = close == null ? "" : close;
 			for (int index = 0; index < value.length - 1; index++) {
-				if (value[index] == "null") {
+				if (value[index] == "null")
 					res = res.append(value[index].concat(", "));
-				} else {
+				else
 					res = res.append(open + value[index].concat(close).concat(", "));
-				}
 			}
 			return value[value.length - 1] == "null" ? res.append(value[value.length - 1]).toString()
 					: res.append(open + value[value.length - 1] + close).toString();
@@ -136,11 +135,9 @@ public class TraceLogUtils {
 		public static <E> boolean isJavaPrimitive(E check) {
 			String typeCheck = check.getClass().getTypeName();
 			for (String type : TraceLogConstants.LIST_PRIMITIVE_TYPE) {
-				if (typeCheck.equals(type) || typeCheck.equals(type.concat(TraceLogConstants.PRIMITIVE_TYPE_ARRAY))) {
+				if (typeCheck.equals(type) || typeCheck.equals(type.concat(TraceLogConstants.PRIMITIVE_TYPE_ARRAY)))
 					return true;
-				}
 			}
-
 			return false;
 		}
 
@@ -218,7 +215,7 @@ public class TraceLogUtils {
 	public static <E> List<String> primitiveTypeToListStr(E argument)
 			throws NumberFormatException, UnsupportedDataTypeException, NullPointerException {
 		List<String> response = new ArrayList<String>();
-		String typeCheck = argument.getClass().getTypeName();
+		String typeCheck = argument == null ? "" : argument.getClass().getTypeName();
 
 		if (typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_SHORT)) {
 			short sho = (short) argument;
@@ -364,21 +361,21 @@ public class TraceLogUtils {
 					isArray = true;
 					// special case Map isnt collection in java 8
 					if (CheckJavaUtils.isJavaUtilMap(field.getType().getName())) {
-						Map<Object, Object> collection = (Map<Object, Object>) field.get(object);
+						Map<?, ?> collection = (Map<?, ?>) field.get(object);
 						transferObjectListToArray = new Object[collection.size()];
 
-						Iterator<Entry<Object, Object>> iterator = collection.entrySet().iterator();
+						Iterator<?> iterator = collection.entrySet().iterator();
 						TransferMapToObject[] mapToObject = new TransferMapToObject[collection.size()];
 						while (iterator.hasNext()) {
-							Map.Entry<Object, Object> obj = iterator.next();
+							Map.Entry<?, ?> obj = (Entry<?, ?>) iterator.next();
 							mapToObject[position] = new TransferMapToObject(obj.getKey(), obj.getValue());
 							transferObjectListToArray[position] = mapToObject[position++];
 						}
 					} else {
-						Collection<Object> collection = (Collection<Object>) field.get(object);
+						Collection<?> collection = (Collection<?>) field.get(object);
 						transferObjectListToArray = new Object[collection.size()];
 						if (CheckJavaUtils.isJavaUtilCollection(collection)) {
-							Iterator iterator = collection.iterator();
+							Iterator<?> iterator = collection.iterator();
 							while (iterator.hasNext()) {
 								Object obj = iterator.next();
 								transferObjectListToArray[position++] = obj;
@@ -414,7 +411,7 @@ public class TraceLogUtils {
 			value = value.substring(0,
 					length < 2 * TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES.length() ? length : length - 2);
 			value += isArray ? TraceLogConstants.REGEX_ARRAY_CLOSE_PARRENTHESES : "";
-			res = res.append("`" + key + "`".concat(" : \"" + value + "\"").concat(", "));
+			res = res.append("`" + key + "`".concat(": \"" + value + "\"").concat(", "));
 		}
 
 		int length = res.toString().length();
@@ -446,7 +443,7 @@ public class TraceLogUtils {
 				stringCollection.add(objectToStr(obj));
 			} else {
 				if (CheckJavaUtils.isJavaUtilMap(obj)) {
-					stringCollection.addAll(mapToListStr((Map<Object, Object>) obj));
+					stringCollection.addAll(mapToListStr((Map<?, ?>) obj));
 				} else if (CheckJavaUtils.isJavaUtilCollection(obj)) {
 					stringCollection.addAll(collectionToListStr((Collection<?>) obj));
 				} else {
@@ -468,13 +465,13 @@ public class TraceLogUtils {
 	 * @throws UnsupportedDataTypeException
 	 * @throws IllegalArgumentException
 	 */
-	public static <T> List<String> mapToListStr(Map<Object, Object> object) throws NoSuchFieldException,
+	public static <T> List<String> mapToListStr(Map<?, ?> object) throws NoSuchFieldException,
 			IllegalAccessException, NullPointerException, UnsupportedDataTypeException, IllegalArgumentException {
 		List<String> stringMap = new ArrayList<String>();
-		Map<Object, Object> collection = object;
-		Iterator<Entry<Object, Object>> iterator = collection.entrySet().iterator();
+		Map<?, ?> collection = object;
+		Iterator<?> iterator = collection.entrySet().iterator();
 		while (iterator.hasNext()) {
-			Map.Entry<Object, Object> obj = iterator.next();
+			Map.Entry<?, ?> obj = (Entry<?, ?>) iterator.next();
 			TransferMapToObject mapToObject = new TransferMapToObject(obj.getKey(), obj.getValue());
 			stringMap.add(objectToStr(mapToObject));
 		}
