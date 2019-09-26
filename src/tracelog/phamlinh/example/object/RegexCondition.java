@@ -3,12 +3,17 @@ package tracelog.phamlinh.example.object;
 public class RegexCondition {
 
 	private String regex; // $${ag}
+	
 	private boolean isArray; // true else object
+	
 	private String type;// argument
+	
 	private String signalPrefix; // ag
+	
 	private String format;
 
 	private String naturePath;// only using for number
+	
 	private String decimal;
 
 	public RegexCondition() {

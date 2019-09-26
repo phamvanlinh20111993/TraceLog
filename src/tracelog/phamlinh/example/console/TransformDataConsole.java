@@ -97,7 +97,7 @@ public class TransformDataConsole {
 	 * @param object
 	 * @return
 	 */
-	protected <T> Boolean checkObjectType(String key, T object) {
+	protected <T> Boolean checkObjectType(String key, Object object) {
 
 		Boolean res = false;
 		String typeCheck = object.getClass().getTypeName();
@@ -106,11 +106,11 @@ public class TransformDataConsole {
 		 */
 		if (object.getClass().isArray() && !object.getClass().getComponentType().isPrimitive()) {
 			Object[] arrayObject = (Object[]) object;
-			object = (T) arrayObject[0];
+			object = (Object) arrayObject[0];
 		}
 		if (CheckJavaUtils.isJavaUtilCollection(object)) {
 			Collection<?> listObject = (Collection<?>) object;
-			object = (T) listObject.iterator().next();
+			object = (Object) listObject.iterator().next();
 		}
 		if (key == TraceLogConstants.REGEX_TYPE_VALUE || TraceLogConstants.REGEX_TYPE_ARGUMENT == key)
 			res = true;
@@ -254,7 +254,7 @@ public class TransformDataConsole {
 				if (argument instanceof Collection<?>)
 					response.addAll(TraceLogUtils.collectionToListStr((Collection<?>) argument));
 				else if (argument instanceof Map<?, ?>)
-					response.addAll(TraceLogUtils.mapToListStr((Map<Object, Object>) argument));
+					response.addAll(TraceLogUtils.mapToListStr((Map<?, ?>) argument));
 				else
 					response.add(TraceLogUtils.objectToStr(argument));
 			}
@@ -267,7 +267,7 @@ public class TransformDataConsole {
 				throw new UnsupportedDataTypeException("Unsupported this DataType: " + argument.getClass().getName());
 			}
 		}
-		
+
 		return response.toArray(new String[response.size()]);
 	}
 
@@ -337,16 +337,14 @@ public class TransformDataConsole {
 		for (int index = 0; index < TraceLogConstants.REGEX_LIST.length; index++) {
 			// add to object
 			temp = getPrefixOnString(string, TraceLogConstants.REGEX_LIST[index]);
-			if (temp.size() > 0) {
+			if (temp.size() > 0)
 				getPosition.putAll(temp);
-			}
 			// add to array
 			String keyPrefix = TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES + TraceLogConstants.REGEX_LIST[index]
 					+ TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES;
 			temp = getPrefixOnString(string, keyPrefix);
-			if (temp.size() > 0) {
+			if (temp.size() > 0)
 				getPosition.putAll(temp);
-			}
 		}
 
 		return getPosition;
@@ -357,8 +355,8 @@ public class TransformDataConsole {
 	 * @param prefixMap
 	 * @param argurment
 	 */
-	protected <E> void checkMapPrefixAndObjectType(Map<Integer, RegexCondition> prefixListOrder, E... argument)
-			throws NullPointerException, NoSuchObjectException {
+	protected <E> void checkMapPrefixAndObjectType(Map<Integer, RegexCondition> prefixListOrder,
+			@SuppressWarnings("unchecked") E... argument) throws NullPointerException, NoSuchObjectException {
 
 		if (argument == null)
 			throw new NoSuchObjectException("Argument can not be null.");
@@ -376,7 +374,6 @@ public class TransformDataConsole {
 									|| TraceLogUtils.CheckJavaUtils.isJavaUtilCollection(argument[position])
 									|| TraceLogUtils.CheckJavaUtils.isJavaUtilMap(argument[position])) != entry
 											.getValue().isArray()) {
-
 						throw new NoSuchObjectException("Prefix " + entry.getValue().getRegex() + " Not Match For Type "
 								+ argument[position].getClass().getTypeName());
 					}
@@ -392,7 +389,7 @@ public class TransformDataConsole {
 	 * @param argument
 	 * @return
 	 */
-	protected <E> String formatToConsoleLog(String string, E... argument) {
+	protected <E> String formatToConsoleLog(String string, @SuppressWarnings("unchecked") E... argument) {
 		String res = new String(string);
 
 		Map<Integer, RegexCondition> prefixListOrder = getPrefixListOnString(string);
