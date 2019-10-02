@@ -103,5 +103,13 @@ public class TraceLogConstants {
 	public static final String[] LIST_PRIMITIVE_TYPE = { PRIMITIVE_TYPE_INTEGER, PRIMITIVE_TYPE_CHAR,
 			PRIMITIVE_TYPE_BYTE, PRIMITIVE_TYPE_LONG, PRIMITIVE_TYPE_FLOAT, PRIMITIVE_TYPE_DOUBLE, PRIMITIVE_TYPE_SHORT,
 			PRIMITIVE_TYPE_BOOLEAN };
+    /**
+     * folder storage data
+     */
+	public static final String FOLDER_STORAGE_LOG = "\\log\\";
+	
+	public static final String LOG_PROJECT_STRUCTURE = "logProjectStructure";
+
+	public static final String LOG_FILE_FORMAT = "yyyy-MM-dd";
 
 }
