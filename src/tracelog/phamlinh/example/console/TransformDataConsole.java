@@ -255,8 +255,14 @@ public class TransformDataConsole {
 					response.addAll(TraceLogUtils.collectionToListStr((Collection<?>) argument));
 				else if (argument instanceof Map<?, ?>)
 					response.addAll(TraceLogUtils.mapToListStr((Map<?, ?>) argument));
-				else
-					response.add(TraceLogUtils.objectToStr(argument));
+				else {
+					if(TraceLogUtils.CheckJavaUtils.isJavaUtilObject(argument)){
+						response.add(argument.toString());
+					}else {
+						response.add(TraceLogUtils.objectToStr(argument));
+					}
+				}
+					
 			}
 		} else {
 			if (CheckJavaUtils.isJavaPrimitive(argument)) {

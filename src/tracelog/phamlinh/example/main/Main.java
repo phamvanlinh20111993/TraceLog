@@ -1,12 +1,15 @@
 package tracelog.phamlinh.example.main;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Dictionary;
 
 import tracelog.phamlinh.example.console.ConsoleLogImpl;
+import tracelog.phamlinh.example.logfile.LoggerFileImpl;
 import tracelog.phamlinh.example.object.KeyPairValue;
 import tracelog.phamlinh.example.object.RegexCondition;
 
@@ -15,7 +18,7 @@ public class Main {
 	public static void main(String[] args) {
 		System.out.println();
 
-		ConsoleLogImpl console = new ConsoleLogImpl();
+		ConsoleLogImpl console = new ConsoleLogImpl("My project prepare to interview");
 
 		console.logError("Can not find value for arguments: %%va. and %%ag and %%ag --- and %%ag",
 				new String("name"), 
@@ -87,6 +90,8 @@ public class Main {
 		console.logWarning("Check type boolean and byte: %%bl = %%by", 
 				new Boolean(true), tmp );  
 		
+		console.logInfo("Test value for value = %%ag", new Date());
+		
 //		Map<String, String> abc = new HashMap<>();
 //		abc.put("fas", "gdfdgdf");
 	//	System.out.println("check " + TraceLogUtils.isJavaUtilObject(test));
@@ -108,5 +113,21 @@ public class Main {
 	
 		
 		//System.out.println(TraceLogUtils.repeatStart("hhe", ".", 3000));
+		
+		LoggerFileImpl loggerFile = new LoggerFileImpl();
+		
+		loggerFile.logFileError("Show list object: %%{ob} = %%{n}", new KeyPairValue[] {
+				new KeyPairValue("karteId", "customerName"), new KeyPairValue("karteId1", "customerName1"), null,
+				new KeyPairValue("karteId2", "customerName2", null, new Integer[] { -1,312321, 1, 2, 3, 4 }),
+				new KeyPairValue("karteId3", "customerName3"),
+				new KeyPairValue("karteId4", "customerName4", new RegexCondition("aaa", true, "aaa", "aaa", "aaa")),
+				new KeyPairValue(test),
+				new KeyPairValue("karteId5", "customerName5",
+						new RegexCondition[] { new RegexCondition("bb", true, "bbb", "bbb", "bbb"),
+								new RegexCondition("ccc", true, "cccc", "ccc", "ccc")})
+				, new KeyPairValue("test map ok bavy", valueTestMap)},
+
+				new Integer[] { 10, 100 });
+		
 	}
 }

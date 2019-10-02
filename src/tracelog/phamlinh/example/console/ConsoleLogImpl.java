@@ -5,17 +5,13 @@ import tracelog.phamlinh.example.utils.TraceLogUtils;
 
 public class ConsoleLogImpl extends TransformDataConsole implements ConsoleLog {
 
-	public ConsoleLogImpl() {
-		System.err.println(TraceLogUtils.StringUtils.StringformatDate(TraceLogUtils.FORMAT_DATE_YYYYMMDDHHMMSSA) + " "
-				+ System.getProperty("user.dir"));
-		System.err.println("\t\t\t## Start trace log. ##\t\t\t");
-	}
+	public ConsoleLogImpl() {}
 
 	public ConsoleLogImpl(String content) {
 		System.err.println(TraceLogUtils.StringUtils.StringformatDate(TraceLogUtils.FORMAT_DATE_YYYYMMDDHHMMSSA) + " "
 				+ System.getProperty("user.dir"));
-		System.err.println("\t\t\t## Start trace log. ##\t\t\t");
-		System.err.println("\t\t\t## " + content);
+		System.err.println("\t\t\t##### Start trace log. #####\t\t\t");
+		System.err.println("\t\t\t##### " + content + " #####\t\t\t");
 	}
 
 	@Override

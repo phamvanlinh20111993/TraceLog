@@ -24,6 +24,7 @@ import tracelog.phamlinh.example.object.TransferMapToObject;
 public class TraceLogUtils {
 
 	public static final String FORMAT_DATE_HHMMSS = "HH:mm:ss";
+	
 	public static final String FORMAT_DATE_YYYYMMDDHHMMSSA = "yyyy-MM-dd hh:mm:ss a";
 
 	/**
@@ -32,7 +33,7 @@ public class TraceLogUtils {
 	 *
 	 */
 	public static class StringUtils {
-
+ 
 		/**
 		 * 
 		 * @param format
@@ -399,13 +400,12 @@ public class TraceLogUtils {
 						if (!obj.getClass().isArray())
 							value += TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES;
 						value += objectToStr(obj) + TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES + ", ";
-					} else {
+					} else 
 						value += (obj != null ? obj.toString() : "null") + ", ";
-					}
 				}
-			} else {
+			} else 
 				value = isArray ? TraceLogConstants.REGEX_ARRAY_OPEN_PARRENTHESES : "null";
-			}
+			
 			int length = value.length();
 
 			value = value.substring(0,
@@ -434,9 +434,9 @@ public class TraceLogUtils {
 	public static <T> List<String> collectionToListStr(Collection<?> object) throws NoSuchFieldException,
 			IllegalAccessException, NullPointerException, UnsupportedDataTypeException, IllegalArgumentException {
 		List<String> stringCollection = new ArrayList<String>();
-
 		Collection<?> collection = object;
 		Iterator<?> iterator = collection.iterator();
+		
 		while (iterator.hasNext()) {
 			Object obj = iterator.next();
 			if (!CheckJavaUtils.isJavaLangObject(obj)) {
