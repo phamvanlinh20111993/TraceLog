@@ -1,9 +1,12 @@
 package tracelog.phamlinh.example.console;
 
+import java.math.BigDecimal;
 import java.rmi.NoSuchObjectException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -147,7 +150,10 @@ public class TransformDataConsole {
 		if (key == TraceLogConstants.REGEX_TYPE_BYTE)
 			res = object instanceof Byte || typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_BYTE)
 					|| typeCheck.equals(TraceLogConstants.PRIMITIVE_TYPE_BYTE + TraceLogConstants.PRIMITIVE_TYPE_ARRAY);
-
+		
+		if(key == TraceLogConstants.REGEX_TYPE_BITSET)
+			res = object instanceof BitSet;
+		
 		return res;
 	}
 
@@ -235,8 +241,8 @@ public class TransformDataConsole {
 	 * @throws IllegalAccessException
 	 * @throws NoSuchFieldException
 	 */
-	protected <E> String[] elementTypeToStr(E argument, RegexCondition condition)
-			throws UnsupportedDataTypeException, NullPointerException, NoSuchFieldException, IllegalAccessException {
+	protected <E> String[] elementTypeToStr(E argument, RegexCondition condition) throws UnsupportedDataTypeException,
+			NullPointerException, NoSuchFieldException, ClassCastException, IllegalAccessException {
 		ArrayList<String> response = new ArrayList<>();
 		if (argument == null)
 			response.add("null");
@@ -255,14 +261,18 @@ public class TransformDataConsole {
 					response.addAll(TraceLogUtils.collectionToListStr((Collection<?>) argument));
 				else if (argument instanceof Map<?, ?>)
 					response.addAll(TraceLogUtils.mapToListStr((Map<?, ?>) argument));
-				else {
-					if(TraceLogUtils.CheckJavaUtils.isJavaUtilObject(argument)){
+				else if (argument instanceof Dictionary<?, ?>)
+					response.addAll(TraceLogUtils.dictionaryToListStr((Dictionary<?, ?>) argument));
+				else if(argument instanceof BigDecimal) {
+					BigDecimal decimal = (BigDecimal) argument; // the value you get
+					response.add(String.valueOf(decimal.doubleValue()));
+				}else  {
+					if (TraceLogUtils.CheckJavaUtils.isJavaUtilObject(argument) || argument instanceof BitSet) {
 						response.add(argument.toString());
-					}else {
+					} else {
 						response.add(TraceLogUtils.objectToStr(argument));
 					}
 				}
-					
 			}
 		} else {
 			if (CheckJavaUtils.isJavaPrimitive(argument)) {
@@ -309,6 +319,9 @@ public class TransformDataConsole {
 			break;
 		case TraceLogConstants.REGEX_TYPE_BOOLEAN:
 			res = res.append(StringUtils.joinString(value, "<<", ">>"));
+			break;
+		case TraceLogConstants.REGEX_TYPE_BITSET:
+			res = res.append(StringUtils.joinString(value, "~|", "|~"));
 			break;
 		default:
 			res = res.append(StringUtils.joinString(value, "|<", ">|"));
@@ -362,11 +375,14 @@ public class TransformDataConsole {
 	 * @param argurment
 	 */
 	protected <E> void checkMapPrefixAndObjectType(Map<Integer, RegexCondition> prefixListOrder,
-			@SuppressWarnings("unchecked") E... argument) throws NullPointerException, NoSuchObjectException {
+			@SuppressWarnings("unchecked") E... argument) throws NullPointerException, NoSuchObjectException, IllegalArgumentException {
 
 		if (argument == null)
 			throw new NoSuchObjectException("Argument can not be null.");
 
+		if(prefixListOrder.size() == 0 && argument.length > 0)
+			throw new IllegalArgumentException("Prefix is not recognize.");
+		
 		if (prefixListOrder.size() != argument.length)
 			throw new NoSuchObjectException("Prefix and Argument Are Not The Same Length.");
 
@@ -374,7 +390,6 @@ public class TransformDataConsole {
 		for (Map.Entry<Integer, RegexCondition> entry : prefixListOrder.entrySet()) {
 			for (int index = 0; index < TraceLogConstants.REGEX_LIST.length; index++) {
 				if (TraceLogConstants.REGEX_LIST[index].equals(entry.getValue().getSignalPrefix())) {
-
 					if (!checkObjectType(TraceLogConstants.REGEX_TYPE[index], argument[position])
 							|| (argument[position].getClass().isArray()
 									|| TraceLogUtils.CheckJavaUtils.isJavaUtilCollection(argument[position])
@@ -439,7 +454,7 @@ public class TransformDataConsole {
 		} catch (NoSuchObjectException e) {
 			e.printStackTrace();
 		}
-
+		
 		return res;
 	}
 

@@ -1,6 +1,8 @@
 package tracelog.phamlinh.example.main;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -92,6 +94,8 @@ public class Main {
 		
 		console.logInfo("Test value for value = %%ag", new Date());
 		
+		console.logInfo("Test value for value = %%n", new BigDecimal(30.5));
+		
 //		Map<String, String> abc = new HashMap<>();
 //		abc.put("fas", "gdfdgdf");
 	//	System.out.println("check " + TraceLogUtils.isJavaUtilObject(test));
@@ -128,6 +132,14 @@ public class Main {
 				, new KeyPairValue("test map ok bavy", valueTestMap)},
 
 				new Integer[] { 10, 100 });
+		
+		 // test for bitset type
+		 BitSet bits1 = new BitSet(16); 
+	     // thiet la mot so bit
+	     for(int i=0; i<16; i++) {
+	        if((i%2) == 0) bits1.set(i);
+	     }
+	     console.logError("Show bitset value: %%bi", bits1);
 		
 	}
 }
