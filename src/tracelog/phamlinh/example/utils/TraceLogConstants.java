@@ -41,6 +41,9 @@ public class TraceLogConstants {
 	public final static String REGEX_BYTE = "by";// &()
 	public final static String REGEX_TYPE_BYTE = "Byte";
 
+	public final static String REGEX_BITSET = "bi";// &()
+	public final static String REGEX_TYPE_BITSET = "BitSet";
+
 	public final static String REGEX_BOOLEAN = "bl"; // << >>
 	public final static String REGEX_TYPE_BOOLEAN = "Boolean";
 
@@ -55,10 +58,11 @@ public class TraceLogConstants {
 	public final static String REGEX_PREFIX = "\\%\\%";
 
 	public final static String[] REGEX_LIST = { REGEX_VALUE, REGEX_ARGUMENT, REGEX_CHAR, REGEX_OBJECT, REGEX_BOOLEAN,
-			REGEX_NUMBER, REGEX_STRING, REGEX_BYTE };
+			REGEX_NUMBER, REGEX_STRING, REGEX_BYTE, REGEX_BITSET };
 
 	public final static String[] REGEX_TYPE = { REGEX_TYPE_VALUE, REGEX_TYPE_ARGUMENT, REGEX_TYPE_CHAR,
-			REGEX_TYPE_OBJECT, REGEX_TYPE_BOOLEAN, REGEX_TYPE_NUMBER, REGEX_TYPE_STRING, REGEX_TYPE_BYTE };
+			REGEX_TYPE_OBJECT, REGEX_TYPE_BOOLEAN, REGEX_TYPE_NUMBER, REGEX_TYPE_STRING, REGEX_TYPE_BYTE,
+			REGEX_TYPE_BITSET };
 
 	/**
 	 * java collection type (not include map)
@@ -68,6 +72,8 @@ public class TraceLogConstants {
 	public final static String COLLECTION_TYPE_SET = "Set";
 
 	public final static String COLLECTION_TYPE_MAP = "Map";
+	
+	public final static String COLLECTION_TYPE_DICTIONARY = "Dictionary";
 
 	public final static String COLLECTION_TYPE_QUEUE = "Queue";
 
@@ -103,11 +109,11 @@ public class TraceLogConstants {
 	public static final String[] LIST_PRIMITIVE_TYPE = { PRIMITIVE_TYPE_INTEGER, PRIMITIVE_TYPE_CHAR,
 			PRIMITIVE_TYPE_BYTE, PRIMITIVE_TYPE_LONG, PRIMITIVE_TYPE_FLOAT, PRIMITIVE_TYPE_DOUBLE, PRIMITIVE_TYPE_SHORT,
 			PRIMITIVE_TYPE_BOOLEAN };
-    /**
-     * folder storage data
-     */
+	/**
+	 * folder storage data
+	 */
 	public static final String FOLDER_STORAGE_LOG = "\\log\\";
-	
+
 	public static final String LOG_PROJECT_STRUCTURE = "logProjectStructure";
 
 	public static final String LOG_FILE_FORMAT = "yyyy-MM-dd";

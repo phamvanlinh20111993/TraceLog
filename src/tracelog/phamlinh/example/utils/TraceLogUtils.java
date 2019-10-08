@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Deque;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.IllegalFormatException;
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +26,7 @@ import tracelog.phamlinh.example.object.TransferMapToObject;
 public class TraceLogUtils {
 
 	public static final String FORMAT_DATE_HHMMSS = "HH:mm:ss";
-	
+
 	public static final String FORMAT_DATE_YYYYMMDDHHMMSSA = "yyyy-MM-dd hh:mm:ss a";
 
 	/**
@@ -33,7 +35,7 @@ public class TraceLogUtils {
 	 *
 	 */
 	public static class StringUtils {
- 
+
 		/**
 		 * 
 		 * @param format
@@ -107,6 +109,7 @@ public class TraceLogUtils {
 				else
 					res = res.append(open + value[index].concat(close).concat(", "));
 			}
+
 			return value[value.length - 1] == "null" ? res.append(value[value.length - 1]).toString()
 					: res.append(open + value[value.length - 1] + close).toString();
 		}
@@ -202,6 +205,24 @@ public class TraceLogUtils {
 		 */
 		public static <E> boolean isJavaUtilMap(E argument) {
 			return argument instanceof Map<?, ?>;
+		}
+
+		/**
+		 * 
+		 * @param check
+		 * @return
+		 */
+		public static <E> boolean isJavaUtilDictionary(String check) {
+			return check.matches("^java\\.util\\." + TraceLogConstants.COLLECTION_TYPE_DICTIONARY + "$");
+		}
+
+		/**
+		 * 
+		 * @param argument
+		 * @return
+		 */
+		public static <E> boolean isJavaUtilDictionary(E argument) {
+			return argument instanceof Dictionary<?, ?>;
 		}
 	}
 
@@ -372,6 +393,17 @@ public class TraceLogUtils {
 							mapToObject[position] = new TransferMapToObject(obj.getKey(), obj.getValue());
 							transferObjectListToArray[position] = mapToObject[position++];
 						}
+
+					} else if (CheckJavaUtils.isJavaUtilDictionary(field.getType().getName())) {
+						Dictionary<?, ?> dictionary = (Dictionary<?, ?>) field.get(object);
+						Enumeration<?> iterator = dictionary.keys();
+						TransferMapToObject[] mapToObject = new TransferMapToObject[dictionary.size()];
+						while (iterator.hasMoreElements()) {
+							Object obj = iterator.nextElement();
+							mapToObject[position] = new TransferMapToObject(obj, dictionary.get(obj));
+							transferObjectListToArray[position] = mapToObject[position++];
+						}
+
 					} else {
 						Collection<?> collection = (Collection<?>) field.get(object);
 						transferObjectListToArray = new Object[collection.size()];
@@ -400,12 +432,12 @@ public class TraceLogUtils {
 						if (!obj.getClass().isArray())
 							value += TraceLogConstants.PREFIX_ARRAY_OPEN_PARRENTHESES;
 						value += objectToStr(obj) + TraceLogConstants.PREFIX_ARRAY_CLOSE_PARRENTHESES + ", ";
-					} else 
+					} else
 						value += (obj != null ? obj.toString() : "null") + ", ";
 				}
-			} else 
+			} else
 				value = isArray ? TraceLogConstants.REGEX_ARRAY_OPEN_PARRENTHESES : "null";
-			
+
 			int length = value.length();
 
 			value = value.substring(0,
@@ -436,7 +468,7 @@ public class TraceLogUtils {
 		List<String> stringCollection = new ArrayList<String>();
 		Collection<?> collection = object;
 		Iterator<?> iterator = collection.iterator();
-		
+
 		while (iterator.hasNext()) {
 			Object obj = iterator.next();
 			if (!CheckJavaUtils.isJavaLangObject(obj)) {
@@ -465,14 +497,39 @@ public class TraceLogUtils {
 	 * @throws UnsupportedDataTypeException
 	 * @throws IllegalArgumentException
 	 */
-	public static <T> List<String> mapToListStr(Map<?, ?> object) throws NoSuchFieldException,
-			IllegalAccessException, NullPointerException, UnsupportedDataTypeException, IllegalArgumentException {
+	public static <T> List<String> mapToListStr(Map<?, ?> object) throws NoSuchFieldException, IllegalAccessException,
+			NullPointerException, UnsupportedDataTypeException, IllegalArgumentException {
 		List<String> stringMap = new ArrayList<String>();
 		Map<?, ?> collection = object;
 		Iterator<?> iterator = collection.entrySet().iterator();
 		while (iterator.hasNext()) {
 			Map.Entry<?, ?> obj = (Entry<?, ?>) iterator.next();
 			TransferMapToObject mapToObject = new TransferMapToObject(obj.getKey(), obj.getValue());
+			stringMap.add(objectToStr(mapToObject));
+		}
+
+		return stringMap;
+	}
+
+	/**
+	 * 
+	 * @param object
+	 * @return
+	 * @throws NoSuchFieldException
+	 * @throws IllegalAccessException
+	 * @throws NullPointerException
+	 * @throws UnsupportedDataTypeException
+	 * @throws IllegalArgumentException
+	 */
+	public static <T> List<String> dictionaryToListStr(Dictionary<?, ?> object) throws NoSuchFieldException,
+			IllegalAccessException, NullPointerException, UnsupportedDataTypeException, IllegalArgumentException {
+		List<String> stringMap = new ArrayList<String>();
+		Dictionary<?, ?> dictionary = object;
+		Enumeration<?> iterator = dictionary.keys();
+
+		while (iterator.hasMoreElements()) {
+			Object obj = iterator.nextElement();
+			TransferMapToObject mapToObject = new TransferMapToObject(obj, dictionary.get(obj));
 			stringMap.add(objectToStr(mapToObject));
 		}
 
